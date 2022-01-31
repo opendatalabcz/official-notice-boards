@@ -1,0 +1,4 @@
+jupyterlab
+mypy
+pandas
+pylint
