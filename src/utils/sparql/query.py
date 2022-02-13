@@ -4,9 +4,10 @@ from typing import Any
 from SPARQLWrapper import SPARQLWrapper, JSON
 from SPARQLWrapper.SPARQLExceptions import SPARQLWrapperException
 
-from src.utils.sparql.endpoints import Endpoint
+from src.utils.sparql.endpoint import Endpoint
 
-_PREFIXES = """
+_PREFIXES = \
+    """
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
     PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -19,11 +20,16 @@ _PREFIXES = """
     PREFIX dct: <http://purl.org/dc/terms/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
     PREFIX ofn: <https://ofn.gov.cz/>
-"""
+    PREFIX l-sgov-sb-111-2009-pojem: <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/>
+    """
+
+# agent has to be set with wikidata endpoint, because it might return HTTP 403 error
+_AGENT = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " \
+         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36"
 
 
 def run_query(query: str, endpoint: Endpoint) -> dict[Any, Any]:
-    sparql = SPARQLWrapper(endpoint.value)
+    sparql = SPARQLWrapper(endpoint.value, agent=_AGENT)
     sparql.setReturnFormat(JSON)
 
     sparql.setQuery(_PREFIXES + query)
