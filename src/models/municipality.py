@@ -16,7 +16,7 @@ class Municipality(db.Model):
     parent = db.relationship("Municipality", remote_side=[ruian])
 
     def __repr__(self):
-        return f"<Municipality(name='{self.name}', ruian='{self.ruian}, ico='{self.ico}')>"
+        return f"<Municipality(name='{self.name}', ico={self.ico}, ruian={self.ruian}, parent_ruian={self.parent_ruian})>"
 
     @classmethod
     def extract_from_dict(cls, data):

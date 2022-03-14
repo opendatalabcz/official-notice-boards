@@ -11,6 +11,9 @@ class Mapper(db.Model):
     ruian = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     ico = db.Column(db.Integer, unique=True, nullable=True)  # , index=True)
 
+    def __repr__(self):
+        return f"<Mapper(ico={self.ico}, ruian={self.ruian})>"
+
     @classmethod
     def extract_from_dict(cls, data):
         ruian = data['ruian']['value']
