@@ -1,5 +1,5 @@
-from src.utils.sparql.endpoint import Endpoint
-from src.utils.sparql.query import run_query
+from src.sparql.endpoint import Endpoint
+from src.sparql.query import run_query
 
 _GET_MAPPER_QUERY = \
     """

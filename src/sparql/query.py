@@ -4,7 +4,7 @@ from typing import Any
 from SPARQLWrapper import SPARQLWrapper, JSON
 from SPARQLWrapper.SPARQLExceptions import SPARQLWrapperException
 
-from src.utils.sparql.endpoint import Endpoint
+from src.sparql.endpoint import Endpoint
 
 _PREFIXES = \
     """
