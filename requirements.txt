@@ -2,3 +2,5 @@ Flask-SQLAlchemy
 requests
 sqlalchemy-stubs
 SPARQLWrapper
+pdfminer.six
+pdfminer.six[image]
