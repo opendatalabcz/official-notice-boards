@@ -4,7 +4,7 @@ import pytest
 
 from src.utils.validators.json_validator import JsonValidator
 
-DATA_DIR_PATH = "utils/validators/data"
+DATA_DIR_PATH = "unit/utils/validators/data"
 
 
 def convert_to_full_path(file_name: str) -> str:
