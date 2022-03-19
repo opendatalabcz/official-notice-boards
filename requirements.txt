@@ -1,4 +1,5 @@
 Flask-SQLAlchemy
+docx2txt
 requests
 sqlalchemy-stubs
 SPARQLWrapper
