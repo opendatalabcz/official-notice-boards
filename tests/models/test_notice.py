@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 
+from src.app import db
 from src.models import Notice
 
 
@@ -11,32 +12,32 @@ from src.models import Notice
             {
                 "datum": "2021-12-30"
             },
-        "expected_datetime": datetime(year=2021, month=12, day=30)
+        "expected_data": (datetime(year=2021, month=12, day=30), False)
     },
     {  # wrong format - unsupported wrong date key
         'input_data':
             {
                 "datum_wrong_format": "2021-12-30"
             },
-        'expected_datetime': None
+        'expected_data': (None, True)
     },
     {  # no date
         'input_data': {},
-        'expected_datetime': None
+        'expected_data': (None, True)
     },
     {  # wrong format - supported wrong date key
         "input_data":
             {
                 "datum_a_čas": "2021-12-30"
             },
-        "expected_datetime": datetime(year=2021, month=12, day=30)
+        "expected_data": (datetime(year=2021, month=12, day=30), False)
     },
     {  # wrong format - supported wrong date key
         "input_data":
             {
                 "Časový okamžik": "2021-12-30"
             },
-        "expected_datetime": datetime(year=2021, month=12, day=30)
+        "expected_data": (datetime(year=2021, month=12, day=30), True)
     },
     {  # extra data
         "input_data":
@@ -44,18 +45,18 @@ from src.models import Notice
                 "foo" : "bar",
                 "datum": "2021-12-30"
             },
-        "expected_datetime": datetime(year=2021, month=12, day=30)
+        "expected_data": (datetime(year=2021, month=12, day=30), False)
     },
     {  # with leading zeros
         "input_data":
             {
                 "datum": "2021-01-01"
             },
-        "expected_datetime": datetime(year=2021, month=1, day=1)
+        "expected_data": (datetime(year=2021, month=1, day=1), False)
     },
 ])
 def test_extract_datetime_from_dict(data):
-    assert data['expected_datetime'] == Notice._extract_datetime_from_dict(data['input_data'])
+    assert data['expected_data'] == Notice._extract_datetime_from_dict(data['input_data'])
 
 
 @pytest.mark.parametrize("data", [
@@ -65,13 +66,15 @@ def test_extract_datetime_from_dict(data):
     {"datum": "2021.12.30"},  # swapped date and month
     {"datum": "20211230"},  # swapped date and month
     {"datum": "2021-1-1"},  # no leading zeros
-    # TODO add more tests; non ISO formats, ...
+    # TODO add more tests; non ISO formats, ..., especially with time
 ])
 def test_extract_datetime_from_dict_exception(data):
     with pytest.raises(Exception):
         Notice._extract_datetime_from_dict(data)
 
 
+# For some keys in expected_data, their value is None, because the instance
+# has not been added to DB, so the default value has not yet been set
 @pytest.mark.parametrize('data', [
     {  # basic
         'input_data':
@@ -101,7 +104,14 @@ def test_extract_datetime_from_dict_exception(data):
                 "iri": "https://www.iri.foo.cz",
                 "name": "This is a name",
                 "post_date": datetime(year=2021, month=12, day=30),
-                "relevant_until": datetime(year=2020, month=11, day=29),
+                "relevant_until_date": datetime(year=2020, month=11, day=29),
+
+                "url_missing": None,
+                "iri_missing": None,
+                "post_date_wrong_format": False,
+                "relevant_until_date_wrong_format": False,
+                "documents_missing": True,
+                "documents_wrong_format": None,
             },
         'document_count': 0
     },
@@ -114,11 +124,18 @@ def test_extract_datetime_from_dict_exception(data):
                 "iri": None,
                 "name": None,
                 "post_date": None,
-                "relevant_until": None,
+                "relevant_until_date": None,
+
+                "url_missing": True,
+                "iri_missing": True,
+                "post_date_wrong_format": True,
+                "relevant_until_date_wrong_format": True,
+                "documents_missing": True,
+                "documents_wrong_format": None,
             },
         'document_count': 0
     },
-    {  # wrong date format
+    {  # unspecified date, but correctly with specs
         'input_data':
             {
                 "url": "https://www.url.foo.cz",
@@ -141,7 +158,14 @@ def test_extract_datetime_from_dict_exception(data):
                 "iri": "https://www.iri.foo.cz",
                 "name": "This is a name",
                 "post_date": datetime(year=2021, month=12, day=30),
-                "relevant_until": None,
+                "relevant_until_date": None,
+
+                "url_missing": None,
+                "iri_missing": None,
+                "post_date_wrong_format": False,
+                "relevant_until_date_wrong_format": False,
+                "documents_missing": True,
+                "documents_wrong_format": None,
             },
         'document_count': 0
     },
@@ -179,7 +203,14 @@ def test_extract_datetime_from_dict_exception(data):
                 "iri": "https://www.iri.foo.cz",
                 "name": "This is a name",
                 "post_date": datetime(year=2021, month=12, day=30),
-                "relevant_until": datetime(year=2020, month=11, day=29),
+                "relevant_until_date": datetime(year=2020, month=11, day=29),
+
+                "url_missing": None,
+                "iri_missing": None,
+                "post_date_wrong_format": False,
+                "relevant_until_date_wrong_format": False,
+                "documents_missing": None,
+                "documents_wrong_format": None,
             },
         'document_count': 1
     },
@@ -230,7 +261,14 @@ def test_extract_datetime_from_dict_exception(data):
                 "iri": "https://www.iri.foo.cz",
                 "name": "This is a name",
                 "post_date": datetime(year=2021, month=12, day=30),
-                "relevant_until": datetime(year=2020, month=11, day=29),
+                "relevant_until_date": datetime(year=2020, month=11, day=29),
+
+                "url_missing": None,
+                "iri_missing": None,
+                "post_date_wrong_format": False,
+                "relevant_until_date_wrong_format": False,
+                "documents_missing": None,
+                "documents_wrong_format": None,
             },
         'document_count': 3
     },
@@ -239,6 +277,7 @@ def test_extract_from_dict(data):
     # with pytest.raises(Exception):
     # assert False
     notice = Notice.extract_from_dict(data['input_data'])
+    # db.session.add(notice)
     for key, value in data['expected_data'].items():
-        assert notice.__dict__[key] == value
+        assert notice.__dict__.get(key) == value
         assert len(notice.documents) == data.get('document_count')

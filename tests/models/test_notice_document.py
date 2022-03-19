@@ -21,6 +21,17 @@ from src.models import NoticeDocument
             {
                 'name': None,
                 'download_url': 'https://www.obec.cz/uredni-deska/doc_1.pdf',
+
+                'name_missing': True,
+                'download_url_missing': None,
+
+                # irelevant for this test
+                'attempted_download': None,
+                'download_url_unreachable': None,
+                'file_missing': None,
+                'attempted_extraction': None,
+                'extraction_fail': None,
+                'file_contains_no_text': None,
             }
     },
     {  # url + name
@@ -34,6 +45,17 @@ from src.models import NoticeDocument
             {
                 'name': 'doc_1.pdf',
                 'download_url': 'https://www.obec.cz/uredni-deska/doc_1.pdf',
+
+                'name_missing': None,
+                'download_url_missing': None,
+
+                # irelevant for this test
+                'attempted_download': None,
+                'download_url_unreachable': None,
+                'file_missing': None,
+                'attempted_extraction': None,
+                'extraction_fail': None,
+                'file_contains_no_text': None,
             }
     },
     {  # empty json dict
@@ -43,6 +65,17 @@ from src.models import NoticeDocument
             {
                 'name': None,
                 'download_url': None,
+
+                'name_missing': True,
+                'download_url_missing': True,
+
+                # irelevant for this test
+                'attempted_download': None,
+                'download_url_unreachable': None,
+                'file_missing': None,
+                'attempted_extraction': None,
+                'extraction_fail': None,
+                'file_contains_no_text': None,
             }
     },
     {  # wrong url name
@@ -54,6 +87,17 @@ from src.models import NoticeDocument
             {
                 'name': None,
                 'download_url': None,
+
+                'name_missing': True,
+                'download_url_missing': True,
+
+                # irelevant for this test
+                'attempted_download': None,
+                'download_url_unreachable': None,
+                'file_missing': None,
+                'attempted_extraction': None,
+                'extraction_fail': None,
+                'file_contains_no_text': None,
             }
     },
     {  # extra data
@@ -67,6 +111,17 @@ from src.models import NoticeDocument
             {
                 'name': 'doc_1.pdf',
                 'download_url': 'https://www.obec.cz/uredni-deska/doc_1.pdf',
+
+                'name_missing': None,
+                'download_url_missing': None,
+
+                # irelevant for this test
+                'attempted_download': None,
+                'download_url_unreachable': None,
+                'file_missing': None,
+                'attempted_extraction': None,
+                'extraction_fail': None,
+                'file_contains_no_text': None,
             }
     },
     {  # wrong name format
@@ -80,6 +135,17 @@ from src.models import NoticeDocument
             {
                 'name': None,
                 'download_url': 'https://www.obec.cz/uredni-deska/doc_1.pdf',
+
+                'name_missing': True,
+                'download_url_missing': None,
+
+                # irelevant for this test
+                'attempted_download': None,
+                'download_url_unreachable': None,
+                'file_missing': None,
+                'attempted_extraction': None,
+                'extraction_fail': None,
+                'file_contains_no_text': None,
             }
     },
 ])
@@ -88,7 +154,7 @@ def test_extract_from_dict(data):
     # assert False
     notice_document = NoticeDocument.extract_from_dict(data.get('input_data', {}))
     for key, value in data.get('expected_data', {}).items():
-        assert notice_document.__dict__[key] == value
+        assert notice_document.__dict__.get(key) == value
 
 
 @pytest.mark.parametrize('data', [
