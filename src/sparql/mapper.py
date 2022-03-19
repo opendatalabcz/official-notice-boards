@@ -3,11 +3,12 @@ from src.sparql.query import run_query
 
 _GET_MAPPER_QUERY = \
     """
-    SELECT DISTINCT ?city ?ruian ?ico
+    SELECT DISTINCT ?city ?ruian ?ico ?location
     WHERE
     {
       {
-        ?city wdt:P7577 ?ruian .
+        ?city wdt:P7577 ?ruian ;
+              wdt:P625 ?location .
         OPTIONAL
         {
           ?city wdt:P4156 ?ico .
@@ -17,7 +18,8 @@ _GET_MAPPER_QUERY = \
       {
         ?city wdt:P31 wd:Q5153359 ;
               wdt:P4156 ?ico ;
-              wdt:P7606 ?ruian .
+              wdt:P7606 ?ruian ;
+              wdt:P625 ?location .
       }
     }
     """

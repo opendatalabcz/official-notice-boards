@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 from src.app import db
@@ -10,17 +11,23 @@ class Mapper(db.Model):
     """
     ruian = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     ico = db.Column(db.Integer, unique=True, nullable=True)  # , index=True)
+    location_latitude = db.Column(db.Float, unique=False, nullable=True)
+    location_longitude = db.Column(db.Float, unique=False, nullable=True)
 
     def __repr__(self):
-        return f"<Mapper(ico={self.ico}, ruian={self.ruian})>"
+        return f"<Mapper(ico={self.ico}, ruian={self.ruian}, " \
+               f"location_latitude={self.location_latitude}, " \
+               f"location_longitude={self.location_longitude})>"
 
     @classmethod
     def extract_from_dict(cls, data):
         ruian = data['ruian']['value']
+        location = data['location']['value']
+        location_latitude, location_longitude = re.findall("Point\((.+)\)", location)[0].split(' ')
         ico = None
         if 'ico' in data:
             ico = data['ico']['value']
-        return cls(ruian=ruian, ico=ico)
+        return cls(ruian=ruian, ico=ico, location_latitude=location_latitude, location_longitude=location_longitude)
 
     @classmethod
     def get_ico(cls, ruian: int) -> Optional[int]:
