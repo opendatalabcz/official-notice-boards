@@ -4,7 +4,6 @@ from typing import Any, Optional
 import requests
 from requests.exceptions import SSLError
 
-from src.models.official_notice_board import OfficialNoticeBoard
 from src.sparql.endpoint import Endpoint
 from src.sparql.query import run_query, _AGENT, _AGENT_DICT
 from src.utils import requests_wrapper
@@ -37,18 +36,18 @@ def fetch_boards_data() -> list[dict[Any, Any]]:
     return query_result['results']['bindings']
 
 
-def fetch_board(url: str) -> list[dict[Any, Any]]:
+def fetch_board(url: str) -> list[dict[Any, Any]] | None:
     response = requests_wrapper.get(url)
     if response is None:
-        return []
+        return None
 
     try:
         json_response = response.json()
     except JSONDecodeError:
-        return []
+        return None
 
     # prob only because of https://opendata.mvcr.cz/api/boards?type=hzs
     if isinstance(json_response, list):
         json_response = json_response[0]
 
-    return json_response.get('informace', [])
+    return json_response.get('informace')
