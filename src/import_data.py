@@ -47,13 +47,22 @@ def import_boards():
     logging.info("Started board data import")
     # download boards only for municipalities and municipality parts with their own ICO
     for board in OfficialNoticeBoard.query\
-            .join(Mapper, OfficialNoticeBoard.ico == Mapper.ico)\
-            .join(Municipality, Mapper.ruian == Municipality.ruian)\
-            .all():
-        for notice_raw in fetch_board(board.download_url):
-            notice_record = Notice.extract_from_dict(notice_raw)
-            db.session.add(notice_record)
-            board.notices.append(notice_record)
+                    .join(Mapper, OfficialNoticeBoard.ico == Mapper.ico)\
+                    .join(Municipality, Mapper.ruian == Municipality.ruian)\
+                    .all():
+        # board.download(directory_path=DOCUMENT_DIRECTORY)  # probably generated, IDK
+        board.download()
+        for notice in board.notices:
+            db.session.add(notice)  # TODO maybe swap order
+            for document in notice.documents:
+                db.session.add(document)  # TODO check if this is necessary
+
+        # for notice_raw in fetch_board(board.download_url):
+        #     notice_record = Notice.extract_from_dict(notice_raw)
+        #     db.session.add(notice_record)
+        #     for document in notice_record.documents:
+        #         db.session.add(document)
+        #     board.notices.append(notice_record)
 
         # break
     logging.info("Finished board data import")
