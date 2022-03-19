@@ -5,6 +5,9 @@ from src.app import db
 
 
 # TODO add relationships to Municipality and maybe others
+from src.utils.random_stuff import nested_get
+
+
 class Mapper(db.Model):
     """
     Mapper model that maps together RUIAN and ICO of municipalities and municipality parts
@@ -21,12 +24,12 @@ class Mapper(db.Model):
 
     @classmethod
     def extract_from_dict(cls, data):
-        ruian = data['ruian']['value']
-        location = data['location']['value']
+        ruian = nested_get(data, ['ruian', 'value'])
+        location = nested_get(data, ['location', 'value'])
         location_latitude, location_longitude = re.findall("Point\((.+)\)", location)[0].split(' ')
         ico = None
         if 'ico' in data:
-            ico = data['ico']['value']
+            ico = nested_get(data, ['ico', 'value'])
         return cls(ruian=ruian, ico=ico, location_latitude=location_latitude, location_longitude=location_longitude)
 
     @classmethod

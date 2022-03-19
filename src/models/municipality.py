@@ -2,6 +2,7 @@ from typing import Optional
 
 from src.app import db
 from src.models.mapper import Mapper
+from src.utils.random_stuff import nested_get
 
 
 class Municipality(db.Model):
@@ -20,7 +21,7 @@ class Municipality(db.Model):
 
     @classmethod
     def extract_from_dict(cls, data):
-        name = data['nazev']['cs']
+        name = nested_get(data, ['nazev', 'cs'])
         ruian = data['kod']
         ico = Mapper.get_ico(ruian)
         parent_ruian: Optional[str] = None
