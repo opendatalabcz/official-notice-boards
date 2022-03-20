@@ -1,11 +1,8 @@
 from json import JSONDecodeError
-from typing import Any, Optional
-
-import requests
-from requests.exceptions import SSLError
+from typing import Any
 
 from src.sparql.endpoint import Endpoint
-from src.sparql.query import run_query, _AGENT, _AGENT_DICT
+from src.sparql.query import run_query
 from src.utils import requests_wrapper
 
 _GET_BOARDS_QUERY = \
