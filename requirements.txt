@@ -1,7 +1,8 @@
 Flask-SQLAlchemy
 docx2txt
-requests
-sqlalchemy-stubs
-SPARQLWrapper
 pdfminer.six
 pdfminer.six[image]
+psycopg2-binary
+requests
+SPARQLWrapper
+sqlalchemy-stubs

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from src.app import db
 from src.models import Notice
 from src.sparql.official_notice_board import fetch_board

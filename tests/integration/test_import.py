@@ -11,8 +11,8 @@ from src.sparql.mapper import fetch_mapper_data
 from src.sparql.municipality import fetch_municipality_list
 from src.sparql.official_notice_board import fetch_boards_data
 
-# DOCUMENT_DIRECTORY = "tests/integration/tmp_documents/"
-DOCUMENT_DIRECTORY = "./integration/tmp_documents/"
+# DOCUMENT_DIRECTORY = "./integration/tmp_documents"
+DOCUMENT_DIRECTORY = "tests/integration/tmp_documents/"
 
 FETCH_BOARDS_COUNT = 10
 FETCH_DOCUMENTS_COUNT = 20

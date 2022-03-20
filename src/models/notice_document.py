@@ -1,17 +1,10 @@
 import logging
 import os
-import re
-from typing import Optional, Type
-
-import flask_whooshalchemy3
 from sqlalchemy import Index
-from whoosh.analysis import StemmingAnalyzer
 
-from src import text_parsers
 from src.app import db
 from src.models.tsvector_impl import TSVector
 from src.text_parsers.mapper import get_parser
-from src.text_parsers.parser import Parser
 from src.utils import requests_wrapper
 from src.utils.random_stuff import return_null_if_empty, nested_get
 
