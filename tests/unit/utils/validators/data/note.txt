@@ -1,4 +1,0 @@
-files from https://json.org/example.html:
-    valid_json.json
-    valid_xml.xml
-    invalid_json_missing_ending_curly_brace.json
