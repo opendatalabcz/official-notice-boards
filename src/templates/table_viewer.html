@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/pagination.html' import render_pager, render_pagination %}
+{% from 'bootstrap5/table.html' import render_table %}
+{% from 'bootstrap5/nav.html' import render_nav_item %}
+
+{% block title %}{{ table_name }}{% endblock %}
+{% block content %}
+    <h1>{{ table_name }}</h1>
+    {{ render_table(records) }}
+    {{ render_pagination(pagination) }}
+{% endblock %}

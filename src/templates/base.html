@@ -1,0 +1,55 @@
+{#from https://bootstrap-flask.readthedocs.io/en/stable/basic/#installation#}
+<!doctype html>
+{% from 'bootstrap5/nav.html' import render_nav_item %}
+<html lang="en">
+<head>
+    {% block head %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        {% block styles %}
+            <!-- Bootstrap CSS -->
+            {{ bootstrap.load_css() }}
+        {% endblock %}
+
+        <title>
+            {% block title %}{% endblock %}
+        </title>
+    {% endblock %}
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+{#        <a class="navbar-brand" href="#">Navbar</a>#}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
+                aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav me-auto">
+                {{ render_nav_item('municipality', 'Municipality', use_li=True) }}
+                {{ render_nav_item('board', 'board', use_li=True) }}
+                {{ render_nav_item('notice', 'notice', use_li=True) }}
+                {{ render_nav_item('document', 'document', use_li=True) }}
+                {% block navbar %}{% endblock %}
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-sm-2" type="text" placeholder="Search">
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+{% block scripts %}
+    <!-- Optional JavaScript -->
+    {{ bootstrap.load_js() }}
+{% endblock %}
+</body>
+</html>
