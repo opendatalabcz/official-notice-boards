@@ -26,7 +26,8 @@ class Mapper(db.Model):
     def extract_from_dict(cls, data):
         ruian = nested_get(data, ['ruian', 'value'])
         location = nested_get(data, ['location', 'value'])
-        location_latitude, location_longitude = re.findall("Point\((.+)\)", location)[0].split(' ')
+        # location_latitude, location_longitude = re.findall("Point\((.+)\)", location)[0].split(' ')
+        location_latitude, location_longitude = None, None
         ico = None
         if 'ico' in data:
             ico = nested_get(data, ['ico', 'value'])
