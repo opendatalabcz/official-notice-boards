@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/pagination.html' import render_pager, render_pagination %}
+{% from 'bootstrap5/table.html' import render_table %}
+
+{% block head %}
+    {{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block title %}Graphs{% endblock %}
+{% block content %}
+    <h1>Graphs</h1>
+    <canvas id="division_of_boards"></canvas>
+    <canvas id="division_of_municipalities"></canvas>
+    <canvas id="file_extensions_count"></canvas>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+
+        var division_of_boards_chart = new Chart(
+            document.getElementById('division_of_boards'),
+            {
+            type: 'pie',
+            data: {
+                labels: ['by municipalities', 'rest'],
+                datasets: [{
+                    label: 'My First dataset',
+                    data: [{{ boards_by_municipalities }}, {{ boards_rest_count }}],
+                    backgroundColor: [
+                      'rgb(250,60,60)',
+                      'rgb(54,111,235)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+                options: {
+                    'responsive': false,
+                }
+            }
+        );
+
+
+        var division_of_municipalities_chart = new Chart(
+            document.getElementById('division_of_municipalities'),
+            {
+            type: 'pie',
+            data: {
+                labels: ['published board', 'rest'],
+                datasets: [{
+                    label: 'My First dataset',
+                    data: [{{ boards_by_municipalities }}, {{ municipalities_rest_count }}],
+                    backgroundColor: [
+                      'rgb(250,60,60)',
+                      'rgb(54,111,235)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+                options: {
+                    'responsive': false,
+                }
+            }
+        );
+
+        var file_extensions_count_chart = new Chart(
+            document.getElementById('file_extensions_count'),
+            {
+            type: 'bar',
+            data: {
+                labels: {{ documents_extensions_labels | safe }},
+                datasets: [{
+                    label: 'File extensions',
+                    data: {{ documents_extensions_data | safe }},
+                    backgroundColor: [
+                      'rgb(250,60,60)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+                options: {
+                    {#'responsive': false,#}
+                }
+            }
+        );
+    </script>
+{% endblock %}

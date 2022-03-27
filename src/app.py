@@ -24,6 +24,8 @@ app.add_url_rule('/municipality', view_func=views.municipality)
 app.add_url_rule('/board', view_func=views.board)
 app.add_url_rule('/notice', view_func=views.notice)
 app.add_url_rule('/document', view_func=views.document)
+app.add_url_rule('/graph', view_func=views.graph)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -13,9 +13,7 @@
             {{ bootstrap.load_css() }}
         {% endblock %}
 
-        <title>
-            {% block title %}{% endblock %}
-        </title>
+        <title>{% block title %}{% endblock %}</title>
     {% endblock %}
 </head>
 
@@ -35,6 +33,7 @@
                 {{ render_nav_item('board', 'board', use_li=True) }}
                 {{ render_nav_item('notice', 'notice', use_li=True) }}
                 {{ render_nav_item('document', 'document', use_li=True) }}
+                {{ render_nav_item('graph', 'graph', use_li=True) }}
                 {% block navbar %}{% endblock %}
             </ul>
             <form class="d-flex">
