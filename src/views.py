@@ -35,7 +35,11 @@ def notice():
 
 def document():
     page = request.args.get('page', 1, type=int)
-    pagination = NoticeDocument.query.paginate(page, per_page=100)
+    search = request.args.get('search')
+    if search is None:
+        pagination = NoticeDocument.query.paginate(page, per_page=PAGE_SIZE)
+    else:
+        pagination = NoticeDocument.query.filter(NoticeDocument.__ts_vector__.match(search)).paginate(page, per_page=PAGE_SIZE)
     records = pagination.items
     return render_template('table_viewer.html', pagination=pagination, records=records, table_name='Notice Documents')
 
