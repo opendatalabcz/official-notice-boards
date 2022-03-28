@@ -1,7 +1,7 @@
 from pdfminer.high_level import extract_text
 from pdfminer.psparser import PSSyntaxError
 
-from src.text_parsers.parser import Parser
+from app.text_parsers.parser import Parser
 
 
 class PDF(Parser):

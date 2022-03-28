@@ -5,11 +5,11 @@ from time import sleep
 
 from sqlalchemy import func
 
-from src.app import db
-from src.models import *
-from src.sparql.mapper import fetch_mapper_data
-from src.sparql.municipality import fetch_municipality_list
-from src.sparql.official_notice_board import fetch_boards_data, fetch_board
+from app import db
+from app.models import *
+from app.sparql.mapper import fetch_mapper_data
+from app.sparql.municipality import fetch_municipality_list
+from app.sparql.official_notice_board import fetch_boards_data, fetch_board
 
 # DOCUMENT_DIRECTORY = "../data/documents/"
 DOCUMENT_DIRECTORY = "../../data/documents/"

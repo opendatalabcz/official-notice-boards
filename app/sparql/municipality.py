@@ -2,8 +2,8 @@ from typing import Any
 
 import requests
 
-from src.sparql.endpoint import Endpoint
-from src.sparql.query import run_query
+from app.sparql.endpoint import Endpoint
+from app.sparql.query import run_query
 
 _MUNICIPALITY_LIST_DESCRIPTION = "Číselník obcí ČR."
 _MUNICIPALITY_PART_LIST_DESCRIPTION = "Číselník městských obvodů a městských částí"

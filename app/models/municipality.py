@@ -1,8 +1,8 @@
 from typing import Optional
 
-from src.app import db
-from src.models.mapper import Mapper
-from src.utils.random_stuff import nested_get
+from app import db
+from app.models.mapper import Mapper
+from app.utils.random_stuff import nested_get
 
 
 class Municipality(db.Model):

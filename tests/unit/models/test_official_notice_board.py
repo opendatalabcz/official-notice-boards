@@ -1,6 +1,6 @@
 import pytest
 
-from src.models import OfficialNoticeBoard
+from app.models import OfficialNoticeBoard
 
 @pytest.mark.parametrize('data', [
     {  # all present

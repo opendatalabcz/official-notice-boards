@@ -1,7 +1,7 @@
-from src.app import db
-from src.models import Notice
-from src.sparql.official_notice_board import fetch_board
-from src.utils.random_stuff import return_null_if_empty, nested_get
+from app import db
+from app.models import Notice
+from app.sparql.official_notice_board import fetch_board
+from app.utils.random_stuff import return_null_if_empty, nested_get
 
 
 class OfficialNoticeBoard(db.Model):

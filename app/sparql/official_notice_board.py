@@ -1,9 +1,9 @@
 from json import JSONDecodeError
 from typing import Any
 
-from src.sparql.endpoint import Endpoint
-from src.sparql.query import run_query
-from src.utils import requests_wrapper
+from app.sparql.endpoint import Endpoint
+from app.sparql.query import run_query
+from app.utils import requests_wrapper
 
 _GET_BOARDS_QUERY = \
     """

@@ -1,4 +1,4 @@
-from src.text_parsers.parser import Parser
+from app.text_parsers.parser import Parser
 
 
 class NoText(Parser):

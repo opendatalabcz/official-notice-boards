@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pytest
 
-from src.app import db
-from src.models import Notice
+from app import db
+from app.models import Notice
 
 
 @pytest.mark.parametrize("data", [

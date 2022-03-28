@@ -1,10 +1,10 @@
 import logging
 from datetime import datetime
 
-from src.app import db
+from app import db
 # from src.models import *
-from src.models.notice_document import NoticeDocument
-from src.utils.random_stuff import return_null_if_empty, nested_get
+from app.models.notice_document import NoticeDocument
+from app.utils.random_stuff import return_null_if_empty, nested_get
 
 
 class Notice(db.Model):

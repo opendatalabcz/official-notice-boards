@@ -3,8 +3,8 @@ from multiprocessing import Process
 
 import numpy as np
 
-from src.app import db
-from src.models import *
+from app import db
+from app.models import *
 
 MAX_PROCESS_COUNT = 12
 

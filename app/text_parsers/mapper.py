@@ -1,9 +1,9 @@
 from typing import Optional, Type
 
-from src.text_parsers.docx import Docx
-from src.text_parsers.no_text import NoText
-from src.text_parsers.parser import Parser
-from src.text_parsers.pdf import PDF
+from app.text_parsers.docx import Docx
+from app.text_parsers.no_text import NoText
+from app.text_parsers.parser import Parser
+from app.text_parsers.pdf import PDF
 
 mapper = {
     'pdf': PDF,

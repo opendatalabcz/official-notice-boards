@@ -2,11 +2,11 @@ import logging
 import os
 from sqlalchemy import Index
 
-from src.app import db
-from src.models.tsvector_impl import TSVector
-from src.text_parsers.mapper import get_parser
-from src.utils import requests_wrapper
-from src.utils.random_stuff import return_null_if_empty, nested_get
+from app import db
+from app.models.tsvector_impl import TSVector
+from app.text_parsers.mapper import get_parser
+from app.utils import requests_wrapper
+from app.utils.random_stuff import return_null_if_empty, nested_get
 
 
 class NoticeDocument(db.Model):
@@ -29,8 +29,6 @@ class NoticeDocument(db.Model):
     extracted_text = db.Column(db.Text, unique=False, nullable=True)
     file_contains_no_text = db.Column(db.Boolean, unique=False, nullable=False, default=False) # jpeg, xls, ...
     #scanned_document = db.Column(db.Boolean, unique=False, nullable=False, default=False)
-
-    # metric = db.relationship('NoticeDocumentMetric', uselist=False, backref='notice', lazy=True)
 
     __ts_vector__ = db.Column(TSVector(), db.Computed(
         "to_tsvector('english', name || ' ' || extracted_text)",

@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from src.models import NoticeDocument
+from app.models import NoticeDocument
 
 
 # def test_extract_from_dict():

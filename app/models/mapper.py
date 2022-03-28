@@ -1,11 +1,11 @@
 import re
 from typing import Optional
 
-from src.app import db
+from app import db
 
 
 # TODO add relationships to Municipality and maybe others
-from src.utils.random_stuff import nested_get
+from app.utils.random_stuff import nested_get
 
 
 class Mapper(db.Model):

@@ -1,6 +1,6 @@
 import docx2txt
 
-from src.text_parsers.parser import Parser
+from app.text_parsers.parser import Parser
 
 
 class Docx(Parser):
