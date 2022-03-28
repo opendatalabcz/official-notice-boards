@@ -24,15 +24,6 @@ def get(url: str, headers=None, params=None, timeout=None) -> requests.Response 
         except requests.exceptions.SSLError:
             logging.debug("RE-sending GET request without SSL certificate verification to %s", url)
             response = requests.get(url, headers=headers, params=params, timeout=timeout, verify=False)  # TODO False should be replace by path to certificate, this might be a security risk, not sure if it should be in final version. Also this option could be called directly, which would make it run faster
-    # except requests.exceptions.SSLError:
-    #     logging.debug("RE-sending GET request without SSL certificate verification to %s", url)
-    #     response = requests.get(url, headers=headers, params=params, timeout=timeout, verify=False)  # TODO False should be replace by path to certificate, this might be a security risk, not sure if it should be in final version. Also this option could be called directly, which would make it run faster
-    #     # try:
-    #     #     logging.debug("RE-sending GET request without SSL certificate verification to %s", url)
-    #     #     response = requests.get(url, headers=headers, params=params, timeout=timeout, verify=False)  # TODO False should be replace by path to certificate, this might be a security risk, not sure if it should be in final version. Also this option could be called directly, which would make it run faster
-    #     # except (requests.exceptions.SSLError, requests.exceptions.ConnectionError):
-    #     #     logging.debug("Connection error when sending GET request to %s", url)
-    #     #     response = None
     except (requests.exceptions.ConnectionError, requests.exceptions.SSLError):
         logging.debug("Connection error when sending GET request to %s", url)
         response = None

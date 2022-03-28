@@ -1,6 +1,6 @@
 import pytest
 
-from src.utils.random_stuff import return_null_if_empty, nested_get
+from app.utils.random_stuff import return_null_if_empty, nested_get
 
 
 @pytest.mark.parametrize('data', [

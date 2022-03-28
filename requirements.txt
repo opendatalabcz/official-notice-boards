@@ -1,5 +1,7 @@
-Flask-SQLAlchemy
+bootstrap-flask
 docx2txt
+Flask-Caching
+Flask-SQLAlchemy
 pdfminer.six
 pdfminer.six[image]
 psycopg2-binary
