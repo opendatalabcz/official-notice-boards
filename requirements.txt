@@ -1,4 +1,5 @@
 bootstrap-flask
+click
 docx2txt
 Flask-Caching
 Flask-SQLAlchemy

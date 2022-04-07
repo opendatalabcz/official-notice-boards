@@ -1,6 +1,7 @@
 from flask import render_template, request
 from sqlalchemy import func
 
+from app import db
 from app.language_translations import translate
 from app.models import *
 
