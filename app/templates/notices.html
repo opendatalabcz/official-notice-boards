@@ -5,6 +5,7 @@
 {% block title %}{{ table_name }}{% endblock %}
 {% block content %}
     <h1>{{ table_name }}</h1>
-    {{ render_table(records, titles=titles, responsive=True, model=OfficialNoticeBoard, show_actions=True, view_url=('view_board', [('board_id', ':id')])) }}
+{#    {{ render_table(records, responsive=True, model=Notice) }}#}
+    {{ render_table(records, titles=titles, responsive=True, model=Notice) }}
     {{ render_pagination(pagination) }}
 {% endblock %}

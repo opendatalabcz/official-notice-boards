@@ -8,6 +8,8 @@ from app.utils.random_stuff import return_null_if_empty, nested_get
 
 
 class Notice(db.Model):
+    __website_columns__ = ['id', 'name', 'url', 'post_date']
+
     id = db.Column(db.Integer, primary_key=True)
     board_id = db.Column(db.Integer, db.ForeignKey('official_notice_board.id'), nullable=True)
 

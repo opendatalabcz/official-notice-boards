@@ -10,6 +10,8 @@ from app.utils.random_stuff import return_null_if_empty, nested_get
 
 
 class NoticeDocument(db.Model):
+    __website_columns__ = ['id', 'name', 'download_url', 'file_extension']
+
     id = db.Column(db.Integer, primary_key=True)
     notice_id = db.Column(db.Integer, db.ForeignKey('notice.id'), nullable=False)
 

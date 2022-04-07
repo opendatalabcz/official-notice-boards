@@ -28,9 +28,12 @@ def view_boards():
         .join(Mapper, OfficialNoticeBoard.ico == Mapper.ico) \
         .join(Municipality, Mapper.ruian == Municipality.ruian) \
         .paginate(page, per_page=PAGE_SIZE)
-    records = pagination.items
+    # records = [record.table_dict for record in pagination.items]
+    records = [filter_model_to_table(record) for record in pagination.items]
+    # titles = [(key, key) for key in OfficialNoticeBoard.__website_columns__]
+    titles = map_table_key_names(OfficialNoticeBoard)
     table_name = translate(DEFAULT_LANGUAGE, 'official notice boards', capitalize_mode=2)
-    return render_template('boards.html', pagination=pagination, records=records, table_name=table_name, OfficialNoticeBoard=OfficialNoticeBoard)
+    return render_template('boards.html', pagination=pagination, records=records, titles=titles, table_name=table_name, OfficialNoticeBoard=OfficialNoticeBoard)
 
 
 def view_board(board_id: int):
@@ -47,9 +50,13 @@ def view_board(board_id: int):
 def view_notices():
     page = request.args.get('page', 1, type=int)
     pagination = Notice.query.paginate(page, per_page=PAGE_SIZE)
-    records = pagination.items
+    # records = pagination.items
+
+    records = [filter_model_to_table(record) for record in pagination.items]
+    titles = map_table_key_names(Notice)
+
     table_name = translate(DEFAULT_LANGUAGE, 'notices', capitalize_mode=2)
-    return render_template('table_viewer.html', pagination=pagination, records=records, table_name=table_name)
+    return render_template('notices.html', pagination=pagination, records=records, titles=titles, table_name=table_name)
 
 
 def view_documents():
@@ -59,9 +66,13 @@ def view_documents():
         pagination = NoticeDocument.query.paginate(page, per_page=PAGE_SIZE)
     else:
         pagination = NoticeDocument.query.filter(NoticeDocument.__ts_vector__.match(search)).paginate(page, per_page=PAGE_SIZE)
-    records = pagination.items
+    # records = pagination.items
+
+    records = [filter_model_to_table(record) for record in pagination.items]
+    titles = map_table_key_names(NoticeDocument)
+
     table_name = translate(DEFAULT_LANGUAGE, 'documents', capitalize_mode=2)
-    return render_template('documents.html', pagination=pagination, records=records, table_name=table_name)
+    return render_template('documents.html', pagination=pagination, records=records, titles=titles, table_name=table_name)
     # return render_template('table_viewer.html', pagination=pagination, records=records, table_name='Notice Documents')
 
 

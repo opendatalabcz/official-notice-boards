@@ -21,8 +21,13 @@ CS: Final[dict[str, str]] = {
     "graphs": "grafy",
     "graph": "graf",
 
+    "id": "id",
+    "ico": "IČO:",
     "name": "název",
     "name missing": "chybí název",
+    "office name": "název úřadu",
+    "post date": "datum vyvěšení",
+    "url": "url",
     "download url": "adresa ke stažení",
     "download url missing": "chybí adresa ke stažení",
     "attempted download": "pokus o stažení",
@@ -60,6 +65,14 @@ def translate(language: str, expressions: str, capitalize_mode: int = 0) -> str 
         return translated_expressions.upper()
 
 
+def translate_only(language: str, expressions: str) -> str | None:
+    if language == 'cs':
+        return CS[expressions]
+    if language == 'en':
+        return expressions
+    raise ValueError(f"Language code {language} is not supported.")
+
+
 def capitalize_first(string: str) -> str:
     if len(string) == 0:
         return string
@@ -70,3 +83,8 @@ def capitalize_first(string: str) -> str:
 
 def capitalize_all_first_letters(string: str) -> str:
     return " ".join(capitalize_first(word) for word in string.split(" "))
+
+
+def split_column_name(name: str) -> str:
+    return name.replace("_", " ").replace("-", " ")
+

@@ -5,6 +5,9 @@ from app.utils.random_stuff import return_null_if_empty, nested_get
 
 
 class OfficialNoticeBoard(db.Model):
+    # __website_columns__ = ['id', 'office_name', 'ico']
+    __website_columns__ = ['id', 'office_name', 'ico', 'download_url', 'download_url_unreachable']
+
     id = db.Column(db.Integer, primary_key=True)
     office_name = db.Column(db.String(100), unique=False, nullable=True)
     office_name_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
