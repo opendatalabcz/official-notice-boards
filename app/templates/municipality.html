@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
+{% from 'bootstrap5/table.html' import render_table %}
+
+
+{% block title %}{{ municipality.name }}{% endblock %}
+{% block content %}
+    <h1>{{ municipality.name }}</h1>
+    {{ render_table([municipality], responsive=True) }}
+
+    <h2>{{ boards_table_name }}</h2>
+    {{ render_table(boards, responsive=True) }}
+    {{ render_pagination(pagination) }}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
+{% from 'bootstrap5/table.html' import render_table %}
+
+{% block title %}{{ table_name }}{% endblock %}
+{% block content %}
+    <h1>{{ table_name }}</h1>
+    <form class="d-flex" action="{{ url_for('view_municipalities') }}" method="get">
+        <input class="form-control me-sm-2" type="text" placeholder="Název obce" name="search">
+        <button class="btn btn-primary my-2 my-sm-0" type="submit">Hledat</button>
+    </form>
+
+    {{ render_table(records, titles=titles, responsive=True, primary_key='ruian', model=Municipality, show_actions=True, view_url=('view_municipality', [('municipality_ruian', ':ruian')])) }}
+    {{ render_pagination(pagination) }}
+{% endblock %}

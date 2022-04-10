@@ -23,6 +23,8 @@ CS: Final[dict[str, str]] = {
 
     "id": "id",
     "ico": "IČO:",
+    "ruian": "ruian",
+    "has board": "má úřední desku",
     "name": "název",
     "name missing": "chybí název",
     "office name": "název úřadu",
@@ -34,6 +36,7 @@ CS: Final[dict[str, str]] = {
     "download url unreachable": "adresa ke stažení není dostupná",
     "downloaded file url": "adresa staženého souboru",
     "file extension": "přípona souboru",
+    "shortened extracted text": "zkrácený extrahováný text",
 
     # TODO add more
 }
