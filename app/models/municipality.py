@@ -9,6 +9,8 @@ class Municipality(db.Model):
     """
     Municipality model
     """
+    __website_columns__ = ['name', 'ruian', 'ico', 'has_board']
+
     name = db.Column(db.String(100), unique=False, nullable=False)
     ruian = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     # municipality parts aside from Prague parts use their mains municipality office ico
@@ -16,8 +18,12 @@ class Municipality(db.Model):
     parent_ruian = db.Column(db.Integer, db.ForeignKey('municipality.ruian'))
     parent = db.relationship("Municipality", remote_side=[ruian])
 
+    boards = db.relationship('OfficialNoticeBoard', backref='municipality', lazy=True)
+    has_board = db.Column(db.Boolean, unique=False, nullable=False, default=False)
+
     def __repr__(self):
-        return f"<Municipality(name='{self.name}', ico={self.ico}, ruian={self.ruian}, parent_ruian={self.parent_ruian})>"
+        return f"<Municipality(name='{self.name}', ico={self.ico}, ruian={self.ruian}, " \
+               f"has_board={self.has_board}, parent_ruian={self.parent_ruian})>"
 
     @classmethod
     def extract_from_dict(cls, data):

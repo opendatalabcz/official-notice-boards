@@ -4,6 +4,7 @@ from sqlalchemy import func
 from app import db
 from app.language_translations import translate
 from app.models import *
+from app.utils.website import filter_model_to_table, map_table_key_names
 
 PAGE_SIZE = 100
 SUB_PAGE_SIZE = 10
@@ -26,8 +27,7 @@ def view_municipalities():
 def view_boards():
     page = request.args.get('page', 1, type=int)
     pagination = OfficialNoticeBoard.query \
-        .join(Mapper, OfficialNoticeBoard.ico == Mapper.ico) \
-        .join(Municipality, Mapper.ruian == Municipality.ruian) \
+        .join(Municipality, OfficialNoticeBoard.ico == Municipality.ico) \
         .paginate(page, per_page=PAGE_SIZE)
     # records = [record.table_dict for record in pagination.items]
     records = [filter_model_to_table(record) for record in pagination.items]

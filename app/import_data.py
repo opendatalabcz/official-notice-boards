@@ -39,7 +39,13 @@ def import_municipalities():
 def import_boards_list():
     logging.info("Started board list data import")
     for row in fetch_boards_data():
-        db.session.add(OfficialNoticeBoard.extract_from_dict(row))
+        new_board = OfficialNoticeBoard.extract_from_dict(row)
+        db.session.add(new_board)
+
+        related_municipalities = Municipality.query.filter(Municipality.ico == new_board.ico).all()
+        for m in related_municipalities:
+            m.boards.append(new_board)
+            m.has_board = True
     logging.info("Finished board list data import")
 
 
@@ -47,23 +53,13 @@ def import_boards():
     logging.info("Started board data import")
     # download boards only for municipalities and municipality parts with their own ICO
     for board in OfficialNoticeBoard.query\
-                    .join(Mapper, OfficialNoticeBoard.ico == Mapper.ico)\
-                    .join(Municipality, Mapper.ruian == Municipality.ruian)\
-                    .all():
-        # board.download(directory_path=DOCUMENT_DIRECTORY)  # probably generated, IDK
+            .join(Municipality, OfficialNoticeBoard.municipality_ruian == Municipality.ruian) \
+            .all():
         board.download()
         for notice in board.notices:
-            db.session.add(notice)  # TODO maybe swap order
+            db.session.add(notice)
             for document in notice.documents:
-                db.session.add(document)  # TODO check if this is necessary
-
-        # for notice_raw in fetch_board(board.download_url):
-        #     notice_record = Notice.extract_from_dict(notice_raw)
-        #     db.session.add(notice_record)
-        #     for document in notice_record.documents:
-        #         db.session.add(document)
-        #     board.notices.append(notice_record)
-
+                db.session.add(document)
         # break
     logging.info("Finished board data import")
 

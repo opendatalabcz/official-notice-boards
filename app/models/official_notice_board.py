@@ -13,6 +13,8 @@ class OfficialNoticeBoard(db.Model):
     office_name_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     # municipality
     ico = db.Column(db.Integer, unique=False, nullable=True)
+    municipality_ruian = db.Column(db.Integer, db.ForeignKey('municipality.ruian'), nullable=True)
+    # ico = db.Column(db.Integer, db.ForeignKey('municipality.ico'), nullable=True)
     ico_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     download_url = db.Column(db.String(255), unique=False, nullable=True)  # 2083
     download_url_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
@@ -23,7 +25,7 @@ class OfficialNoticeBoard(db.Model):
 
     def __repr__(self):
         return f"<OfficialNoticeBoard(id={self.id}, name='{self.office_name}', " \
-               f"ico={self.ico}, download_url='{self.download_url}')>"
+               f"ico={self.ico}, download_url=' {self.download_url} ')>"
 
     @classmethod
     def extract_from_dict(cls, data):
