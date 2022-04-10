@@ -6,9 +6,81 @@
 {% block title %}{{ municipality.name }}{% endblock %}
 {% block content %}
     <h1>{{ municipality.name }}</h1>
-    {{ render_table([municipality], responsive=True) }}
+{#    {{ render_table([municipality], responsive=True) }}#}
 
-    <h2>{{ boards_table_name }}</h2>
-    {{ render_table(boards, responsive=True) }}
-    {{ render_pagination(pagination) }}
+{#    Print municipality#}
+    <table class="table">
+        <tr>
+            <td>Název</td>
+            <td>{{ municipality.name }}</td>
+        </tr>
+        <tr>
+            <td>Ruian</td>
+            <td>{{ municipality.ruian }}</td>
+        </tr>
+        <tr>
+            <td>IČO</td>
+            <td>{{ municipality.ico }}</td>
+        </tr>
+        <tr class="{% if municipality.has_board %}table-success{% else %}table-danger{% endif %}">
+            <td>Má desku</td>
+            <td>{{ municipality.has_board }}</td>
+        </tr>
+    </table>
+
+{##}
+{#    {% if board.download_url_missing %}#}
+{#    {% elif board.download_url_unreachable %}#}
+{#    {% else %}#}
+{#    {% endif %}#}
+
+{#    Print board/s#}
+    {% if municipality.has_board %}
+
+        <h2>Úřední deska</h2>
+        {% if municipality.boards|length > 1 %}{{ render_pagination(pagination) }}{% endif %}
+        {% for board in boards %}
+            <table class="table">
+{#            name#}
+            <tr>
+                <td>Název</td>
+                <td>{{ board.office_name }}</td>
+            </tr>
+
+{#            download url#}
+            {% if board.download_url_missing %}
+                <tr class="table-danger">
+                    <td>Odkaz ke stažení</td>
+                    <td>Chybí</td>
+                </tr>
+            {% elif not board.attempted_download %}
+                <tr>
+                    <td>Odkaz ke stažení</td>
+                    <td><a href="{{ board.download_url }}">Zatím neprovedem pokus o stáhnutí</a></td>
+                </tr>
+            {% elif board.download_url_unreachable %}
+                <tr class="table-warning">
+                    <td>Odkaz ke stažení</td>
+                    <td><a href="{{ board.download_url }}">Nedostupný</a></td>
+                </tr>
+            {% else %}
+                <tr class="table-success">
+                    <td>Odkaz ke stažení</td>
+                    <td><a href="{{ board.download_url }}">Dostupný</a></td>
+                </tr>
+            {% endif %}
+            </table>
+
+{#            list notices#}
+            {% if board.notices|length > 0 %}
+            <h2>Vývěsky</h2>
+            {{ render_table(board.notices, responsive=True) }}
+            {% endif %}
+
+        {% endfor %}
+
+{#        <h2>Deska</h2>#}
+{#        {{ render_table(boards, responsive=True) }}#}
+
+    {% endif %}
 {% endblock %}

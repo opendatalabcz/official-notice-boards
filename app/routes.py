@@ -56,11 +56,15 @@ def view_municipalities():
 
     search = request.args.get('search')
     if search is None or len(search) == 0:
-        pagination = Municipality.query.paginate(page, per_page=PAGE_SIZE)
+        pagination = Municipality.query \
+            .order_by(desc(Municipality.has_board)) \
+            .order_by(Municipality.name) \
+            .paginate(page, per_page=PAGE_SIZE)
     else:
         pagination = Municipality.query\
             .filter(Municipality.name.ilike(f'%{search}%'))\
-            .order_by(Municipality.name)\
+            .order_by(desc(Municipality.has_board)) \
+            .order_by(Municipality.name) \
             .paginate(page, per_page=PAGE_SIZE)
     # pagination = Municipality.query.paginate(page, per_page=PAGE_SIZE)
     records = pagination.items
@@ -73,12 +77,14 @@ def view_municipality(municipality_ruian: int):
     municipality = Municipality.query.filter(Municipality.ruian == municipality_ruian).first()
 
     page = request.args.get('page', 1, type=int)
-    pagination = OfficialNoticeBoard.query.filter(OfficialNoticeBoard.municipality_ruian == municipality.ruian).paginate(page, per_page=SUB_PAGE_SIZE)
+    pagination = OfficialNoticeBoard.query\
+        .filter(OfficialNoticeBoard.municipality_ruian == municipality.ruian)\
+        .paginate(page, per_page=1)
     boards = pagination.items
 
     boards_table_name = translate(DEFAULT_LANGUAGE, 'official notice boards', capitalize_mode=2)
     # return render_template('municipality.html', municipality=municipality)
-    return render_template('municipality.html', municipality=municipality, boards_table_name=boards_table_name, pagination=pagination, boards=boards)
+    return render_template('municipality.html', municipality=municipality, pagination=pagination, boards=boards)
 
 
 # @cache.cached(timeout=50)
