@@ -14,7 +14,7 @@ setup(
         'click==8.1.2',
         'docx2txt==0.8',
         'Flask-Caching==1.10.1',
-        'Flask-Migrate==3.1.0'
+        'Flask-Migrate==3.1.0',
         'Flask-SQLAlchemy==2.5.1',
         'pdfminer.six==20220319',
         'pdfminer.six[image]',
