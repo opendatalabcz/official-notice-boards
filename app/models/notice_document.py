@@ -9,8 +9,11 @@ from app.utils import requests_wrapper
 from app.utils.random_stuff import return_null_if_empty, nested_get
 
 
+MIN_TEXT_LENGTH = 50
+
+
 class NoticeDocument(db.Model):
-    __website_columns__ = ['id', 'name', 'download_url', 'file_extension']
+    __website_columns__ = ['id', 'name', 'download_url', 'file_extension', 'shortened_extracted_text']
 
     id = db.Column(db.Integer, primary_key=True)
     notice_id = db.Column(db.Integer, db.ForeignKey('notice.id'), nullable=False)
@@ -29,6 +32,7 @@ class NoticeDocument(db.Model):
     attempted_extraction = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     extraction_fail = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     extracted_text = db.Column(db.Text, unique=False, nullable=True)
+    shortened_extracted_text = db.Column(db.String(30), unique=False, nullable=True)
     file_contains_no_text = db.Column(db.Boolean, unique=False, nullable=False, default=False) # jpeg, xls, ...
     #scanned_document = db.Column(db.Boolean, unique=False, nullable=False, default=False)
 
@@ -121,6 +125,9 @@ class NoticeDocument(db.Model):
             return False
 
         # Check if text is empty
-        if self.extracted_text is None:
+        if self.extracted_text is None or len(self.extracted_text) < MIN_TEXT_LENGTH:
             self.file_contains_no_text = True
+        else:
+            # stripped_short_text = self.extracted_text[:MIN_TEXT_LENGTH].strip()
+            self.shortened_extracted_text = self.extracted_text[:30].strip() + '...'
         return True
