@@ -29,11 +29,12 @@
 
         <div class="collapse navbar-collapse" id="navbarColor01">
             <ul class="navbar-nav me-auto">
+                {{ render_nav_item('view_index', 'About', use_li=True) }}
                 {{ render_nav_item('view_municipalities', 'Municipalities', use_li=True) }}
                 {{ render_nav_item('view_boards', 'Official Notice Boards', use_li=True) }}
                 {{ render_nav_item('view_notices', 'Notices', use_li=True) }}
                 {{ render_nav_item('view_documents', 'Notice Document', use_li=True) }}
-                {{ render_nav_item('view_graphs', 'Graphs', use_li=True) }}
+{#                {{ render_nav_item('view_graphs', 'Graphs', use_li=True) }}#}
                 {% block navbar %}{% endblock %}
             </ul>
 {#            <form class="d-flex" action="{{ url_for('documents') }}" method="get">#}

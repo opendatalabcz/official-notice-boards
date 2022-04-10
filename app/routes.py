@@ -11,8 +11,43 @@ SUB_PAGE_SIZE = 10
 DEFAULT_LANGUAGE = 'cs'  # TODO move elsewhere
 
 
-def index():
-    return render_template('index.html')
+def view_index():
+
+    # # get counts of notices per municipality
+    # db.session.query(func.count(Notice.id)) \
+    #     .select_from(OfficialNoticeBoard)\
+    #     .outerjoin(Notice) \
+    #     .join(Mapper, OfficialNoticeBoard.ico == Mapper.ico) \
+    #     .join(Municipality, Mapper.ruian == Municipality.ruian) \
+    #     .group_by(OfficialNoticeBoard.id).all()
+
+    all_boards_count = OfficialNoticeBoard.query.count()
+    boards_by_municipalities = OfficialNoticeBoard.query \
+        .join(Municipality, OfficialNoticeBoard.municipality_ruian == Municipality.ruian) \
+        .count()
+    boards_rest_count = all_boards_count - boards_by_municipalities
+
+    all_municipality_offices_count = Municipality.query.count()
+    municipalities_rest_count = all_municipality_offices_count - boards_by_municipalities
+
+    documents_extensions_query = db.session.query(func.count(NoticeDocument.file_extension).
+                           label('total_count'),
+                           NoticeDocument.file_extension)\
+        .group_by(NoticeDocument.file_extension)\
+        .limit(10).all()
+    documents_extensions_query.sort(reverse=True)
+    documents_extensions_data, documents_extensions_labels = map(list, zip(*documents_extensions_query))
+    documents_extensions_labels = ['None' if x is None else x for x in documents_extensions_labels]
+
+    # page_name = translate(DEFAULT_LANGUAGE, 'graphs', capitalize_mode=2)
+    page_name = 'About'
+    return render_template('index.html',
+                           page_name=page_name,
+                           boards_by_municipalities=boards_by_municipalities,
+                           boards_rest_count=boards_rest_count,
+                           municipalities_rest_count=municipalities_rest_count,
+                           documents_extensions_data=documents_extensions_data,
+                           documents_extensions_labels=documents_extensions_labels)
 
 
 def view_municipalities():
@@ -74,43 +109,3 @@ def view_documents():
 
     table_name = translate(DEFAULT_LANGUAGE, 'documents', capitalize_mode=2)
     return render_template('documents.html', pagination=pagination, records=records, titles=titles, table_name=table_name)
-    # return render_template('table_viewer.html', pagination=pagination, records=records, table_name='Notice Documents')
-
-
-def view_graphs():
-
-    # # get counts of notices per municipality
-    # db.session.query(func.count(Notice.id)) \
-    #     .select_from(OfficialNoticeBoard)\
-    #     .outerjoin(Notice) \
-    #     .join(Mapper, OfficialNoticeBoard.ico == Mapper.ico) \
-    #     .join(Municipality, Mapper.ruian == Municipality.ruian) \
-    #     .group_by(OfficialNoticeBoard.id).all()
-
-    all_boards_count = OfficialNoticeBoard.query.count()
-    boards_by_municipalities = OfficialNoticeBoard.query \
-        .join(Mapper, OfficialNoticeBoard.ico == Mapper.ico) \
-        .join(Municipality, Mapper.ruian == Municipality.ruian) \
-        .count()
-    boards_rest_count = all_boards_count - boards_by_municipalities
-
-    all_municipality_offices_count = Municipality.query.count()
-    municipalities_rest_count = all_municipality_offices_count - boards_by_municipalities
-
-    documents_extensions_query = db.session.query(func.count(NoticeDocument.file_extension).
-                           label('total_count'),
-                           NoticeDocument.file_extension)\
-        .group_by(NoticeDocument.file_extension)\
-        .all()
-    documents_extensions_query.sort(reverse=True)
-    documents_extensions_data, documents_extensions_labels = map(list, zip(*documents_extensions_query))
-    documents_extensions_labels = ['None' if x is None else x for x in documents_extensions_labels]
-
-    page_name = translate(DEFAULT_LANGUAGE, 'graphs', capitalize_mode=2)
-    return render_template('graph.html',
-                           page_name=page_name,
-                           boards_by_municipalities=boards_by_municipalities,
-                           boards_rest_count=boards_rest_count,
-                           municipalities_rest_count=municipalities_rest_count,
-                           documents_extensions_data=documents_extensions_data,
-                           documents_extensions_labels=documents_extensions_labels)
