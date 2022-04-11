@@ -1,5 +1,5 @@
 from flask import render_template, request
-from sqlalchemy import func
+from sqlalchemy import func, desc
 
 from app import db
 from app.language_translations import translate

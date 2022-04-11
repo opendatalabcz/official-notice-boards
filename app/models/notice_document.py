@@ -109,6 +109,13 @@ class NoticeDocument(db.Model):
             return True
         self.attempted_extraction = True
 
+        # if file extension is .html, that means the download_url
+        # is pointing to a webpage nad not a file, or the url is invalid
+        if self.file_extension == 'html':
+            logging.info('Skipping extraction of html file')
+            self.file_contains_no_text = True
+            return False
+
         # gets parser for given file extension
         parser = get_parser(self.file_extension)
         if parser is None:

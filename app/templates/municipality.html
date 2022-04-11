@@ -22,17 +22,14 @@
             <td>IČO</td>
             <td>{{ municipality.ico }}</td>
         </tr>
-        <tr class="{% if municipality.has_board %}table-success{% else %}table-danger{% endif %}">
-            <td>Má desku</td>
-            <td>{{ municipality.has_board }}</td>
-        </tr>
+        {% if not municipality.has_board %}
+            <tr class="table-danger">
+                <td>Úřední deska</td>
+                <td>Chybí</td>
+            </tr>
+        {% endif %}
     </table>
 
-{##}
-{#    {% if board.download_url_missing %}#}
-{#    {% elif board.download_url_unreachable %}#}
-{#    {% else %}#}
-{#    {% endif %}#}
 
 {#    Print board/s#}
     {% if municipality.has_board %}
@@ -56,7 +53,7 @@
             {% elif not board.attempted_download %}
                 <tr>
                     <td>Odkaz ke stažení</td>
-                    <td><a href="{{ board.download_url }}">Zatím neprovedem pokus o stáhnutí</a></td>
+                    <td><a href="{{ board.download_url }}">Zatím neproveden pokus o stáhnutí</a></td>
                 </tr>
             {% elif board.download_url_unreachable %}
                 <tr class="table-warning">
@@ -73,14 +70,181 @@
 
 {#            list notices#}
             {% if board.notices|length > 0 %}
-            <h2>Vývěsky</h2>
-            {{ render_table(board.notices, responsive=True) }}
+                <h2>Vývěsky</h2>
+                {% for notice in board.notices %}
+{#                    <hr>#}
+                    <div class="divider py-1 bg-dark"></div>
+                    <table class="table">
+{#                        name#}
+                        {% if notice.name_missing %}
+                            <tr class="table-danger">
+                                <td>Název</td>
+                                <td>Chybí</td>
+                            </tr>
+                        {% else %}
+                            <tr class="table-success">
+                                <td>Název</td>
+                                <td>{{ notice.name }}</td>
+                            </tr>
+                        {% endif %}
+
+{#                        url #}
+                        {% if notice.url_missing %}
+                            <tr class="table-danger">
+                                <td>Odkaz na web</td>
+                                <td>Chybí</td>
+                            </tr>
+                        {% else %}
+                            <tr class="table-success">
+                                <td>Odkaz na web</td>
+                                <td><a href="{{ notice.url }}">Dostupný</a></td>
+                            </tr>
+                        {% endif %}
+
+                        <tr>
+                            <td>Datum publikace</td>
+                            <td>{{ notice.post_date }}</td>
+                        </tr>
+
+                        {% if notice.documents_missing %}
+                            <tr class="table-warning">
+                                <td>Přiložené dokumenty</td>
+                                <td>Chybí</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+
+                    {% if not notice.documents_missing %}
+                        <h5>Přiložené dokumenty</h5>
+                    {% endif %}
+
+{#                    documents#}
+{#                    {% for document in notice.documents %}#}
+{#                        <table class="table">#}
+{#                        name#}
+{#                        {% if document.name_missing %}#}
+{#                            <tr class="table-danger">#}
+{#                                <td>Název</td>#}
+{#                                <td>Chybí</td>#}
+{#                            </tr>#}
+{#                        {% else %}#}
+{#                            <tr class="table-success">#}
+{#                                <td>Název</td>#}
+{#                                <td>{{ document.name }}</td>#}
+{#                            </tr>#}
+{#                        {% endif %}#}
+{##}
+{##}
+                        {#            download url#}
+{#                        {% if document.download_url_missing %}#}
+{#                            <tr class="table-danger">#}
+{#                                <td>Odkaz ke stažení</td>#}
+{#                                <td>Chybí</td>#}
+{#                            </tr>#}
+{#                        {% elif not document.attempted_download %}#}
+{#                            <tr>#}
+{#                                <td>Odkaz ke stažení</td>#}
+{#                                <td><a href="{{ document.download_url }}">Zatím neproveden pokus o stáhnutí</a></td>#}
+{#                            </tr>#}
+{#                        {% elif document.download_url_unreachable %}#}
+{#                            <tr class="table-warning">#}
+{#                                <td>Odkaz ke stažení</td>#}
+{#                                <td><a href="{{ document.download_url }}">Nedostupný</a></td>#}
+{#                            </tr>#}
+{#                        {% elif document.file_missing %}#}
+{#                            <tr class="table-warning">#}
+{#                                <td>Odkaz ke stažení</td>#}
+{#                                <td><a href="{{ document.download_url }}">Není dokument</a></td>#}
+{#                            </tr>#}
+{#                        {% else %}#}
+{#                            <tr class="table-success">#}
+{#                                <td>Odkaz ke stažení</td>#}
+{#                                <td><a href="{{ document.download_url }}">Dostupný</a></td>#}
+{#                            </tr>#}
+{#                        {% endif %}#}
+{##}
+{##}
+{#                        extracted text#}
+{#                        {% if not document.attempted_extraction %}#}
+{#                            <tr>#}
+{#                                <td>Extrahovaný text</td>#}
+{#                                <td>Zatím neproveden pokus o extrakci</td>#}
+{#                            </tr>#}
+{#                        {% elif document.extraction_fail %}#}
+{#                            <tr class="table-danger">#}
+{#                                <td>Extrahovaný text</td>#}
+{#                                <td>Chyba při extrakci</td>#}
+{#                            </tr>#}
+{#                        {% elif document.file_contains_no_text %}#}
+{#                            <tr class="table-danger">#}
+{#                                <td>Extrahovaný text</td>#}
+{#                                <td>Chybí</td>#}
+{#                            </tr>#}
+{#                        {% else %}#}
+{#                            <tr class="table-success">#}
+{#                                <td>Extrahovaný text</td>#}
+{#                                <td>{{ document.shortened_extracted_text }}</td>#}
+{#                            </tr>#}
+{#                        {% endif %}#}
+{##}
+{##}
+{#                        </table>#}
+{#                    {% endfor %}#}
+
+{#                    documents#}
+                    <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Název</th>
+                            <th scope="col">Odkaz ke stažení</th>
+                            <th scope="col">Extrahovaný text</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for document in notice.documents %}
+                        <tr>
+{#                        name#}
+                            {% if document.name_missing %}
+                                <td class="table-danger">Chybí</td>
+                            {% else %}
+                                <td class="table-success">{{ document.name }}</td>
+                            {% endif %}
+
+{#                            download url#}
+                            {% if document.download_url_missing %}
+                                    <td class="table-danger">Chybí</td>
+                            {% elif not document.attempted_download %}
+                                    <td><a href="{{ document.download_url }}">Zatím neproveden pokus o stáhnutí</a></td>
+                            {% elif document.download_url_unreachable %}
+                                    <td class="table-warning"><a href="{{ document.download_url }}">Nedostupný</a></td>
+                            {% elif document.file_missing %}
+                                    <td class="table-warning"><a href="{{ document.download_url }}">Není dokument</a></td>
+                            {% else %}
+                                    <td class="table-success"><a href="{{ document.download_url }}">Dostupný</a></td>
+                            {% endif %}
+
+
+{#                            extracted text#}
+                            {% if not document.attempted_extraction %}
+                                    <td>Zatím neproveden pokus o extrakci</td>
+                            {% elif document.extraction_fail %}
+                                    <td class="table-danger">Chyba při extrakci</td>
+                            {% elif document.file_contains_no_text %}
+                                    <td class="table-danger">Chybí</td>
+                            {% else %}
+                                    <td class="table-success">{{ document.shortened_extracted_text }}</td>
+                            {% endif %}
+
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+
+
+                {% endfor %}
             {% endif %}
 
         {% endfor %}
-
-{#        <h2>Deska</h2>#}
-{#        {{ render_table(boards, responsive=True) }}#}
 
     {% endif %}
 {% endblock %}
