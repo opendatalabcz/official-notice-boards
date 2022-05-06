@@ -88,6 +88,10 @@ def test_extract_datetime_from_dict_exception(data):
                 "název": {
                     "cs": "This is a name"
                 },
+                "popis": {
+                    "cs": "This is a description. Lorem ipsum, and stuff like that you know"
+                },
+                "číslo_jednací": "ref 2022/01 smth 5",
                 "vyvěšení": {
                     "typ": "Časový okamžik",
                     "datum": "2021-12-30"
@@ -103,11 +107,13 @@ def test_extract_datetime_from_dict_exception(data):
                 "url": "https://www.url.foo.cz",
                 "iri": "https://www.iri.foo.cz",
                 "name": "This is a name",
+                "description": "This is a description. Lorem ipsum, and stuff like that you know",
+                "reference_number": "ref 2022/01 smth 5",
                 "post_date": datetime(year=2021, month=12, day=30),
                 "relevant_until_date": datetime(year=2020, month=11, day=29),
 
-                "url_missing": None,
-                "iri_missing": None,
+                "url_missing": False,
+                "iri_missing": False,
                 "post_date_wrong_format": False,
                 "relevant_until_date_wrong_format": False,
                 "documents_missing": True,
@@ -160,8 +166,8 @@ def test_extract_datetime_from_dict_exception(data):
                 "post_date": datetime(year=2021, month=12, day=30),
                 "relevant_until_date": None,
 
-                "url_missing": None,
-                "iri_missing": None,
+                "url_missing": False,
+                "iri_missing": False,
                 "post_date_wrong_format": False,
                 "relevant_until_date_wrong_format": False,
                 "documents_missing": True,
@@ -205,8 +211,8 @@ def test_extract_datetime_from_dict_exception(data):
                 "post_date": datetime(year=2021, month=12, day=30),
                 "relevant_until_date": datetime(year=2020, month=11, day=29),
 
-                "url_missing": None,
-                "iri_missing": None,
+                "url_missing": False,
+                "iri_missing": False,
                 "post_date_wrong_format": False,
                 "relevant_until_date_wrong_format": False,
                 "documents_missing": None,
@@ -263,8 +269,8 @@ def test_extract_datetime_from_dict_exception(data):
                 "post_date": datetime(year=2021, month=12, day=30),
                 "relevant_until_date": datetime(year=2020, month=11, day=29),
 
-                "url_missing": None,
-                "iri_missing": None,
+                "url_missing": False,
+                "iri_missing": False,
                 "post_date_wrong_format": False,
                 "relevant_until_date_wrong_format": False,
                 "documents_missing": None,

@@ -1,10 +1,37 @@
 {% extends "base.html" %}
-{% from 'bootstrap5/pagination.html' import render_pager, render_pagination %}
-{% from 'bootstrap5/table.html' import render_table %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
+{% from 'bootstrap5/table.html' import render_table, build_url %}
 
 {% block title %}{{ table_name }}{% endblock %}
 {% block content %}
     <h1>{{ table_name }}</h1>
-    {{ render_table(records, titles=titles, responsive=True, model=OfficialNoticeBoard, show_actions=True, view_url=('view_board', [('board_id', ':id')])) }}
-    {{ render_pagination(pagination) }}
+    <form class="d-flex" action="{{ url_for('view_boards') }}" method="get">
+        <input class="form-control me-sm-2" type="text" placeholder="Název desky / vydavatele dat" name="search">
+        <button class="btn btn-primary my-2 my-sm-0" type="submit">Hledat</button>
+    </form>
+
+
+
+    <table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Název</th>
+            <th scope="col">Název vydavatele dat</th>
+            <th scope="col">IČO vydavatele dat</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for board in records %}
+        <tr>
+{#            <td>{{ municipality.name }}</td>#}
+            <td><a href="{{ build_url('view_board', OfficialNoticeBoard, board.id, [('board_id', ':id')]) | trim }}">{{ board.name }}</a></td>
+            <td>{{ board.office_name }}</td>
+            <td>{{ '%08d' % board.ico }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+
+    {{ render_pagination(pagination, align='center') }}
 {% endblock %}

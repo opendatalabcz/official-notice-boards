@@ -1,13 +1,9 @@
-import logging
-import os.path
-from signal import SIGINT
-from time import sleep
+from flask import current_app
+from sqlalchemy import func, inspect
 
-from sqlalchemy import func
-
-from app import db
+from app import db, create_app
 from app.models import *
-from app.sparql.mapper import fetch_mapper_data
+from app.sparql.mapper import fetch_ruian_2_ico_mapper, fetch_extended_power_municipalities_list
 from app.sparql.municipality import fetch_municipality_list
 from app.sparql.official_notice_board import fetch_boards_data, fetch_board
 
@@ -15,96 +11,154 @@ from app.sparql.official_notice_board import fetch_boards_data, fetch_board
 DOCUMENT_DIRECTORY = "../../data/documents/"
 
 
-def import_mapper():
-    logging.info("Started mapper data import")
-    for map_raw in fetch_mapper_data():
-        db.session.add(Mapper.extract_from_dict(map_raw))
-    logging.info("Finished mapper data import")
+def first_import() -> bool:
+    inspector = inspect(db.engine)
+    if not inspector.has_table("municipality"):
+        return True
+
+    # municipalities_imported = bool(Municipality.query.count() > 6000)  # not necessary, because of the next one
+    ruian_2_ico_mapped = bool(Municipality.query.filter(Municipality.ico != None).count() > 6000)
+    extended_power_mapped = bool(Municipality.query.filter(Municipality.has_extended_competence == True).count() > 200)
+    return not (ruian_2_ico_mapped and extended_power_mapped)
 
 
 def import_municipalities():
-    logging.info("Started municipality data import")
+    current_app.logger.info("Started municipality data import")
+    print("Started municipality data import")
     for municipality_raw in fetch_municipality_list(is_part=False):
         municipality_record = Municipality.extract_from_dict(municipality_raw)
         db.session.add(municipality_record)
-    logging.info("Finished municipality data import")
+    current_app.logger.info("Finished municipality data import")
 
-    logging.info("Started municipality part data import")
+    current_app.logger.info("Started municipality part data import")
     for municipality_part_raw in fetch_municipality_list(is_part=True):
         municipality_part_record = Municipality.extract_from_dict(municipality_part_raw)
         db.session.add(municipality_part_record)
-    logging.info("Finished municipality part data import")
+    current_app.logger.info("Finished municipality part data import")
+    print("Finished municipality part data import")
+
+
+def map_municipalities_ruian_2_ico():
+    current_app.logger.info("Started mapper data import")
+    print("Started mapper data import")
+    for ruian, ico in fetch_ruian_2_ico_mapper():
+        municipality_record = Municipality.query.filter(Municipality.ruian == ruian).first()
+        if municipality_record is None:
+            current_app.logger.warning("Cannot ")
+        municipality_record.ico = ico
+    print("Finished mapper data import")
+    current_app.logger.info("Finished mapper data import")
+
+
+def mark_municipalities_with_extended_power():
+    current_app.logger.info("Started mapper data import")
+    for ruian in fetch_extended_power_municipalities_list():
+        municipality_record = Municipality.query.filter(Municipality.ruian == ruian).first()
+        if municipality_record is not None:
+            municipality_record.has_extended_competence = True
+    current_app.logger.info("Finished mapper data import")
 
 
 def import_boards_list():
-    logging.info("Started board list data import")
+    print("Started board list data import")
+    current_app.logger.info("Started board list data import")
+
     for row in fetch_boards_data():
         new_board = OfficialNoticeBoard.extract_from_dict(row)
-        db.session.add(new_board)
+        # new_boards.append(new_board)
+        existing_boards = OfficialNoticeBoard.query\
+            .filter(OfficialNoticeBoard.download_url == new_board.download_url and
+                    OfficialNoticeBoard.office_name == new_board.office_name) \
+            .order_by(OfficialNoticeBoard.id)\
+            .all()
+        if len(existing_boards) > 0:
+            print(f"Found existing identical board, office_name='{new_board.office_name}', download_url={new_board.download_url}")
+            current_app.logger.info("Found existing identical board, office_name='%s', download_url=%s", new_board.office_name, new_board.download_url)
+            if len(existing_boards) > 1:
+                print(f"Multiple existing identical boards found, office_name='{new_board.office_name}', download_url={new_board.download_url}")
+                current_app.logger.error("Multiple existing identical boards found, office_name='%s', download_url=%s", new_board.office_name, new_board.download_url)
 
-        related_municipalities = Municipality.query.filter(Municipality.ico == new_board.ico).all()
-        for m in related_municipalities:
-            m.boards.append(new_board)
-            m.has_board = True
-    logging.info("Finished board list data import")
+        # brand new board
+        elif len(existing_boards) == 0:
+            current_app.logger.info("Found new board")
+            print("Found new board")
+            db.session.add(new_board)
+            related_municipalities = Municipality.query.filter(Municipality.ico == new_board.ico).all()
+            for m in related_municipalities:
+                m.boards.append(new_board)
+                m.has_board = True
+
+    current_app.logger.info("Finished board list data import")
+    print("Finished board list data import")
 
 
-def import_boards():
-    logging.info("Started board data import")
-    # download boards only for municipalities and municipality parts with their own ICO
-    for board in OfficialNoticeBoard.query\
-            .join(Municipality, OfficialNoticeBoard.municipality_ruian == Municipality.ruian) \
-            .all():
+def import_boards(only_municipality_boards: bool):
+    current_app.logger.info("Started board data import")
+
+    query = OfficialNoticeBoard.query
+    if only_municipality_boards:
+        current_app.logger.info("Importing only municipality boards")
+        print("Importing only municipality boards")
+        query = query.join(Municipality, OfficialNoticeBoard.municipality_ruian == Municipality.ruian)
+
+    for board in query.all():
         board.download()
-        for notice in board.notices:
-            db.session.add(notice)
-            for document in notice.documents:
+        for notice_record in board.notices:
+            db.session.add(notice_record)
+            for document in notice_record.documents:
                 db.session.add(document)
         # break
-    logging.info("Finished board data import")
+    current_app.logger.info("Finished board data import")
 
 
-def download_documents():
-    logging.info("Started documents download")
+def download_extract_documents(directory_path: str, delete_files: bool):
+    current_app.logger.info("Started documents download and text extraction")
 
     # random order, so that 1 server is not hit too often
-    for document in NoticeDocument.query.order_by(func.random()).all():
-        document.download(directory_path=DOCUMENT_DIRECTORY)
-        # db.session.commit()
+    for document in NoticeDocument.query\
+            .filter(NoticeDocument.attempted_download == False)\
+            .order_by(func.random())\
+            .all():
 
-    logging.info("Finished documents download")
+        document.download(directory_path=directory_path)
+        # if document.download(directory_path=directory_path):  # TODO maybe switch to this
+        document.extract_text()
+        if delete_files:
+            document.delete_file()
+        db.session.commit()  # TODO might delete this
 
-
-def extract_documents_text():
-    logging.info("Started documents text extraction")
-    for document in NoticeDocument.query.all():
-        if document.extracted_text is None:
-            print(f"\textracting {document}")
-            document.extract_text()
-            # db.session.commit()
-        else:
-            print(f"\tSKIPPING: {document}")
-    logging.info("Finished documents text extraction")
+    current_app.logger.info("Finished documents download and text extraction")
 
 
-def import_all():
-    db.drop_all()
-    db.create_all()
-    import_mapper()
-    import_municipalities()
+def import_data(force_import_all: bool):
+    print("Before calling create_app")
+
+    app = create_app()
+    app.app_context().push()
+    current_app.logger.info("After pushing APP context")
+
+    print("Starting import")
+    if first_import() or force_import_all:
+        current_app.logger.info("Importing all data")
+        print("THIS IS FIRST IMPORT")
+        db.drop_all()
+        db.create_all()
+        current_app.logger.info("Dropped and created database")
+        print("Dropped and created database")
+
+        import_municipalities()
+        map_municipalities_ruian_2_ico()
+        mark_municipalities_with_extended_power()
+
     import_boards_list()
-    import_boards()  # can be parallelized, but probably not worth it
+    import_boards(only_municipality_boards=current_app.config["IMPORT_ONLY_MUNICIPALITY_BOARDS"])
+
     db.session.commit()
 
-    download_documents()  # can be parallelized
-    db.session.commit()
-
-    extract_documents_text()  # can be parallelized
+    download_extract_documents(directory_path=current_app.config["DOWNLOADED_DOCUMENT_DIRECTORY"],
+                               delete_files=current_app.config["DELETE_DOCUMENTS_AFTER_EXTRACTION"])
     db.session.commit()
 
 
 if __name__ == '__main__':
-    try:
-        import_all()
-    except KeyboardInterrupt:
-        db.session.commit()
+    import_data(force_import_all=False)

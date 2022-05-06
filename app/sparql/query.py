@@ -3,6 +3,7 @@ from typing import Any
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from SPARQLWrapper.SPARQLExceptions import SPARQLWrapperException
+from flask import current_app
 
 from app.sparql.endpoint import Endpoint
 
@@ -34,8 +35,9 @@ def run_query(query: str, endpoint: Endpoint) -> dict[Any, Any]:
 
     sparql.setQuery(_PREFIXES + query)
     try:
+        current_app.logger.info("Sending SPARQL query: %s", query)
         ret = sparql.query()
         return ret.convert()
     except SPARQLWrapperException:
-        logging.info("Sparql Query failed: %s", query)
+        current_app.logger.warning("Sparql Query failed: %s", query)
     return {'status': 'failed'}

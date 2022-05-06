@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/pagination.html' import render_pager, render_pagination %}
+{% from 'bootstrap5/table.html' import render_table %}
+
+{#{% block head %}#}
+{#    {{ super() }}#}
+{#    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>#}
+{#{% endblock %}#}
+
+{% block title %}Statistiky úředních desek{% endblock %}
+{% block content %}
+    <h1>Statistiky úředních desek</h1>
+
+    <div class="col mt-3">
+        <div class="row mt-3">
+{#            <div class="row mb-3">#}
+            <div class="col mx-3">
+{#                <h4>Podíl obecních úřadú s rozšířenou působností, které publikují úřední desky</h4>#}
+                <h4>Stav publikování obecními úřady s rozšířenou působností</h4>
+            </div>
+            <div class="col mx-3">
+                <h4>Podíl desek publikovaných obecními úřady, podle toho zdali se jedná o úřad s rozšířenou působností, či ne</h4>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col mx-3">
+                <canvas id="division_of_offices_w_extended_competence"></canvas>
+            </div>
+            <div class="col mx-3">
+                <canvas id="division_of_municipality_boards_w_extended_competence"></canvas>
+            </div>
+        </div>
+
+        <div class="row my-3">
+            <h4>Porušení Desky obecních úřadů s nesplňují minimální povinnou specifikace</h4>
+            <canvas id="municipalities_no_comply_min_spec"></canvas>
+        </div>
+
+
+        <div class="row my-3">
+            <h4>Desky obecních úřadů s nejvíce dokumenty s nedostupnou URL adresou</h4>
+            <canvas id="municipalities_unreachable_documents"></canvas>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col mx-3">
+                <h4>Typy dokumentů přiložených k úředním deskám obecních úřadů</h4>
+{#                <canvas id="file_extensions_count"></canvas>#}
+            </div>
+            <div class="col mx-3">
+                <h4>Podíl PDF dokumentů obsahují textovou vrstvu</h4>
+{#                <canvas id="division_of_pdfs_on_text"></canvas>#}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col mx-3">
+{#                <h4>Typy dokumentů přiložených k úředním deskám obecních úřadů</h4>#}
+                <canvas id="file_extensions_count"></canvas>
+            </div>
+            <div class="col mx-3">
+{#                <h4>Podíl PDF dokumentů obsahují textovou vrstvu</h4>#}
+                <canvas id="division_of_pdfs_on_text"></canvas>
+            </div>
+        </div>
+
+        <div class="row my-3">
+            <h4>Desky obecních úřadů s nejvíce PDF dokumenty, které nemají textovou vrstvu (naskenované dokumenty)</h4>
+            <canvas id="municipalities_scanned_pdfs_documents"></canvas>
+        </div>
+
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+
+        var division_of_offices_w_extended_competence = new Chart(
+            document.getElementById('division_of_offices_w_extended_competence'),
+            {
+                type: 'bar',
+                data: {
+                    labels: ['publikují', 'nepublikují'],
+                    datasets: [{
+                        label: 'this is label',
+                        data: [{{ graph_data['extended_competence_publish_out_of_all']['do_comply'] }},
+                                {{ graph_data['extended_competence_publish_out_of_all']['dont_comply'] }}],
+                        backgroundColor: [
+                          'rgb(250,60,60)',
+                          'rgb(54,111,235)',
+                        ],
+                        hoverOffset: 4
+                     }]
+                },
+                options: {
+                    responsive: true
+                    {#legend: {#}
+                    {#    position: 'top',#}
+                    {# }, #}
+                    {#title: {#}
+                    {#    display: true,#}
+                    {#    text: 'Chart.js Bar Chart'#}
+                        {#text: 'Graf znázorňující podíl obecních úřadú které publikují úřední desky'#}
+                    {# } #}
+                }
+            }
+
+        );
+
+
+         var division_of_municipality_boards_w_extended_competence = new Chart(
+            document.getElementById('division_of_municipality_boards_w_extended_competence'),
+            {
+                type: 'bar',
+                data: {
+                    labels: ['s rozšířenou působností', 'bez rozšířené působnosti'],
+                    datasets: [{
+                        label: 'this is label',
+                        data: [{{ graph_data['extended_competence_publish_out_of_municipalities']['extended'] }},
+                                {{ graph_data['extended_competence_publish_out_of_municipalities']['not_extended'] }}],
+                        backgroundColor: [
+                          'rgb(250,60,60)',
+                          'rgb(54,111,235)',
+                        ],
+                        hoverOffset: 4
+                     }]
+                },
+                options: {
+                    responsive: true
+                }
+            }
+
+        );
+
+        var file_extensions_count_chart = new Chart(
+            document.getElementById('file_extensions_count'),
+            {
+            type: 'bar',
+            data: {
+                labels: {{ graph_data['file_extensions_count']['labels'] | safe }},
+                datasets: [{
+                    label: 'File extensions',
+                    data: {{ graph_data['file_extensions_count']['data'] | safe }},
+                    backgroundColor: [
+                      'rgb(250,60,60)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+                options: {
+                    'responsive': true,
+                }
+            }
+        );
+
+        var division_of_pdfs_on_text = new Chart(
+            document.getElementById('division_of_pdfs_on_text'),
+            {
+                type: 'bar',
+                data: {
+                    labels: ['s textovou vrstvou', 'bez textové vrstvy'],
+                    datasets: [{
+                        label: 'this is label',
+                        data: [{{ graph_data['PDFs_text']['with'] }},
+                                {{ graph_data['PDFs_text']['without'] }}],
+                        backgroundColor: [
+                          'rgb(250,60,60)',
+                          'rgb(54,111,235)',
+                        ],
+                        hoverOffset: 4
+                     }]
+                },
+                options: {
+                    responsive: true
+                }
+            }
+
+        );
+
+        var municipalities_unreachable_documents = new Chart(
+            document.getElementById('municipalities_unreachable_documents'),
+            {
+            type: 'bar',
+            data: {
+                labels: {{ graph_data['municipalities_unreachable_documents']['labels'] | safe }},
+                datasets: [{
+                    label: 'File extensions',
+                    data: {{ graph_data['municipalities_unreachable_documents']['data'] | safe }},
+                    backgroundColor: [
+                      'rgb(250,60,60)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+                options: {
+                    'responsive': true,
+                }
+            }
+        );
+
+        var municipalities_scanned_pdfs_documents = new Chart(
+            document.getElementById('municipalities_scanned_pdfs_documents'),
+            {
+            type: 'bar',
+            data: {
+                labels: {{ graph_data['municipalities_scanned_pdfs_documents']['labels'] | safe }},
+                datasets: [{
+                    label: 'File extensions',
+                    data: {{ graph_data['municipalities_scanned_pdfs_documents']['data'] | safe }},
+                    backgroundColor: [
+                      'rgb(250,60,60)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+                options: {
+                    'responsive': true,
+                }
+            }
+        );
+
+        {#var municipalities_missing_notices_iri = new Chart(#}
+        {#    document.getElementById('municipalities_missing_notices_iri'),#}
+        {#    {#}
+        {#    type: 'bar',#}
+        {#    data: {#}
+        {#        labels: {{ graph_data['municipalities_missing_notices_iri']['labels'] | safe }},#}
+        {#        datasets: [{#}
+        {#            label: 'File extensions',#}
+        {#            data: {{ graph_data['municipalities_missing_notices_iri']['data'] | safe }},#}
+        {#            backgroundColor: [#}
+        {#              'rgb(250,60,60)',#}
+        {#            ],#}
+        {#            hoverOffset: 4#}
+        {#        }]#}
+        {#    },#}
+        {#        options: {#}
+        {#            'responsive': true,#}
+        {#        }#}
+        {#    }#}
+        {#);#}
+
+        var municipalities_no_comply_min_spec = new Chart(
+            document.getElementById('municipalities_no_comply_min_spec'),
+            {
+            type: 'bar',
+            data: {
+                labels: {{ graph_data['municipalities_no_comply_min_spec']['labels'] | safe }},
+                datasets: [{
+                    label: 'File extensions',
+                    data: {{ graph_data['municipalities_no_comply_min_spec']['data'] | safe }},
+                    backgroundColor: [
+                      'rgb(250,60,60)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+                options: {
+                    'responsive': true,
+                }
+            }
+        );
+    </script>
+{% endblock %}

@@ -1,5 +1,7 @@
 import logging
 import os
+
+from flask import current_app
 from sqlalchemy import Index
 
 from app import db
@@ -21,21 +23,21 @@ class NoticeDocument(db.Model):
     name = db.Column(db.String(1024), unique=False, nullable=True)
     name_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
 
-    download_url = db.Column(db.String(1024), unique=False, nullable=True)  # not required
+    download_url = db.Column(db.String(1024), unique=False, nullable=True)
     download_url_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     attempted_download = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     download_url_unreachable = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     downloaded_file_path = db.Column(db.String(255), unique=False, nullable=True)
 
     file_extension = db.Column(db.String(10), unique=False, nullable=True)
-    file_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)  # TODO when file extention == .html?
+    file_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     attempted_extraction = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     extraction_fail = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     extracted_text = db.Column(db.Text, unique=False, nullable=True)
-    shortened_extracted_text = db.Column(db.String(30), unique=False, nullable=True)
-    file_contains_no_text = db.Column(db.Boolean, unique=False, nullable=False, default=False) # jpeg, xls, ...
-    #scanned_document = db.Column(db.Boolean, unique=False, nullable=False, default=False)
+    shortened_extracted_text = db.Column(db.String(100), unique=False, nullable=True)
+    file_contains_no_text = db.Column(db.Boolean, unique=False, nullable=False, default=False)  # jpeg, xls, ...
 
+    # if True:  # change condition, this can be used to allow compatibility with other databases. Find out this could be find out from db instance
     __ts_vector__ = db.Column(TSVector(), db.Computed(
         "to_tsvector('english', name || ' ' || extracted_text)",
         persisted=True))
@@ -47,7 +49,6 @@ class NoticeDocument(db.Model):
         return f"<NoticeDocument(id={self.id}, name='{self.name}', download_url='{self.download_url}', " \
                f"downloaded_file_path='{self.downloaded_file_path}', file_extension='{self.file_extension}', " \
                f"extracted_text='{self.extracted_text[:10]+'...' if self.extracted_text is not None else None}'>"
-               # f"len(extracted_text)={len(self.extracted_text)}>"
 
     @classmethod
     def full_text_search(cls, query: str) -> list:
@@ -70,21 +71,16 @@ class NoticeDocument(db.Model):
         return new_instance
 
     def download(self, directory_path: str, force_re_download: bool = False) -> bool:
-        if self.download_url_missing:
-            logging.info('Missing download url for document with id: %d', self.id)
-            return False
         if self.attempted_download and not force_re_download:
             logging.info('Skipping downloading document from %s', self.download_url)
             return True
         self.attempted_download = True
 
-        file_path = os.path.join(directory_path, f"document_id_{self.id}")
+        if self.download_url_missing:
+            logging.info('Missing download url for document with id: %d', self.id)
+            return False
 
-        # skip download if file already exists  # TODO delete
-        # if os.path.isfile(file_path):
-        #     logging.info(f'File {file_path} already exists, skipping download')
-        #     print(f'File {file_path} already exists, skipping download')
-        #     return True
+        file_path = os.path.join(directory_path, f"document_id_{self.id}")
 
         # download document
         logging.info('Downloading document from %s to %s', self.download_url, file_path)
@@ -127,14 +123,25 @@ class NoticeDocument(db.Model):
         logging.info('Extracting text from %s', self.downloaded_file_path)
         try:
             self.extracted_text = parser.parse(self.downloaded_file_path)
-        except Exception:
+            if self.extracted_text is not None:
+                self.extracted_text = self.extracted_text.replace("\x00", "\uFFFD")
+        except Exception as e:
             self.extraction_fail = True
+            current_app.logger.warn(f'Extraction of document {self} failed with exception {e}', exc_info=True)
             return False
+
+        # TODO if empty and pdf, try OCR
+        #  check https://stackoverflow.com/questions/63983531/use-tesseract-ocr-to-extract-text-from-a-scanned-pdf-folders
 
         # Check if text is empty
         if self.extracted_text is None or len(self.extracted_text) < MIN_TEXT_LENGTH:
             self.file_contains_no_text = True
         else:
             # stripped_short_text = self.extracted_text[:MIN_TEXT_LENGTH].strip()
-            self.shortened_extracted_text = self.extracted_text[:30].strip() + '...'
+            self.shortened_extracted_text = self.extracted_text[:97].strip() + '...'
         return True
+
+    def delete_file(self):
+        if self.downloaded_file_path is not None:
+            os.remove(self.downloaded_file_path)
+            self.downloaded_file_path = None

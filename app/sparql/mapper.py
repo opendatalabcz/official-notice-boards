@@ -1,5 +1,6 @@
 from app.sparql.endpoint import Endpoint
 from app.sparql.query import run_query
+from app.utils.random_stuff import nested_get
 
 # _GET_MAPPER_QUERY = \
 #     """
@@ -24,7 +25,7 @@ from app.sparql.query import run_query
 #     }
 #     """
 
-_GET_MAPPER_QUERY = \
+MAP_RUIAN_2_ICO_QUERY = \
     """
     SELECT DISTINCT ?city ?ruian ?ico
     WHERE
@@ -45,6 +46,29 @@ _GET_MAPPER_QUERY = \
     }
     """
 
-def fetch_mapper_data():
-    query_result = run_query(_GET_MAPPER_QUERY, Endpoint.WIKIDATA)
-    return query_result['results']['bindings']
+EXTENDED_POWER_MUNICIPALITIES_QUERY = \
+    """
+    SELECT DISTINCT ?city ?ruian
+    {
+        ?city wdt:P31 wd:Q7819319 ;
+              wdt:P7606 ?ruian
+    }
+    """
+
+
+def fetch_ruian_2_ico_mapper():
+    """Iterator that return tuples of (ruian, ico)"""
+    query_result = run_query(MAP_RUIAN_2_ICO_QUERY, Endpoint.WIKIDATA)['results']['bindings']
+
+    for record in query_result:
+        yield (
+            nested_get(record, ['ruian', 'value']),
+            nested_get(record, ['ico', 'value'])
+        )
+
+
+def fetch_extended_power_municipalities_list():
+    query_result = run_query(EXTENDED_POWER_MUNICIPALITIES_QUERY, Endpoint.WIKIDATA)['results']['bindings']
+
+    for record in query_result:
+        yield nested_get(record, ['ruian', 'value'])

@@ -1,0 +1,287 @@
+{% macro render_document(document) %}
+    <tr>
+    {#                        name#}
+        {% if document.name_missing %}
+            <td class="table-danger">Chybí</td>
+        {% else %}
+    {#                                <td class="table-success">{{ document.name }}</td>#}
+            <td>{{ document.name }}</td>
+        {% endif %}
+
+    {#                            download url#}
+        {% if document.download_url_missing %}
+                <td class="table-danger">Chybí</td>
+        {% elif not document.attempted_download %}
+                <td class="table-info"><a href="{{ document.download_url }}">Zatím neproveden pokus o stáhnutí</a></td>
+        {% elif document.download_url_unreachable %}
+                <td class="table-danger"><a href="{{ document.download_url }}">Nedostupný</a></td>
+        {% elif document.file_missing %}
+                <td class="table-danger"><a href="{{ document.download_url }}">Nejedná se o dokument</a></td>
+        {% else %}
+    {#                                    <td class="table-success"><a href="{{ document.download_url }}">Dostupný</a></td>#}
+                <td><a href="{{ document.download_url }}">Dostupný</a></td>
+        {% endif %}
+
+
+    {#                            extracted text#}
+        {% if not document.attempted_extraction %}
+                <td class="table-info">Zatím neproveden pokus o extrakci</td>
+        {% elif document.extraction_fail %}
+                <td class="table-danger">Chyba při extrakci</td>
+        {% elif document.file_contains_no_text %}
+                <td class="table-danger">Neobsahuje textovou vrstvu</td>
+        {% else %}
+    {#                                    <td class="table-success">{{ document.shortened_extracted_text }}</td>#}
+                <td>{{ document.shortened_extracted_text }}</td>
+        {% endif %}
+
+        <td>{{ document.file_extension }}</td>
+
+    </tr>
+{%- endmacro %}
+
+
+{% macro render_documents(documents) %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Název</th>
+                <th scope="col">Odkaz ke stažení</th>
+                <th scope="col">Ukázka extrahovaného textu</th>
+                <th scope="col">Přípona souboru</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for document in documents %}
+            {{ render_document(document) }}
+        {% endfor %}
+        </tbody>
+    </table>
+{%- endmacro %}
+
+
+{% macro render_notice(notice) %}
+
+{#                    <hr>#}
+{#    <div class="divider py-1 bg-dark"></div>#}
+
+    <div class="card border-dark mb-3">
+        {% if notice.name_missing %}
+            <h5 class="card-header" >Název chybí</h5>
+        {% else %}
+            <h5 class="card-header" >{{ notice.name }}</h5>
+        {% endif %}
+        <div class="card-body">
+            <table class="table">
+
+        {#                        url #}
+                {% if notice.url_missing %}
+                    <tr class="table-danger">
+                        <td>Odkaz na web</td>
+                        <td>Chybí</td>
+                    </tr>
+                {% else %}
+        {#                            <tr class="table-success">#}
+                    <tr>
+                        <td>Odkaz na web</td>
+                        <td><a href="{{ notice.url }}">Dostupný</a></td>
+                    </tr>
+                {% endif %}
+
+                {#                        reference_numbet#}
+                {% if notice.reference_number_missing %}
+{#                    <tr class="table-danger">#}
+                    <tr>
+                        <td>Číslo jednací</td>
+                        <td>Chybí</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td>Číslo jednací</td>
+                        <td>{{ notice.reference_number }}</td>
+                    </tr>
+                {% endif %}
+
+
+{#                post_date#}
+                {% if notice.post_date == None %}
+                     <tr class="table-danger">
+                        <td>Datum vyvěšení</td>
+                        <td>Chybí</td>
+                    </tr>
+                {% else %}
+                    <tr {% if notice.post_date_wrong_format %}class="table-warning"{% endif %}>
+                    <td>Datum vyvěšení</td>
+                    <td>{{ notice.post_date.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% endif %}
+
+
+
+{#                relevant_until_date#}
+                {% if notice.relevant_until_date == None %}
+                     <tr class="table-danger">
+                        <td>Relevantní do</td>
+                        <td>Chybí</td>
+                    </tr>
+                {% else %}
+                    <tr {% if notice.relevant_until_date_wrong_format %}class="table-warning"{% endif %}>
+                    <td>Relevantní do</td>
+                    <td>{{ notice.relevant_until_date.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% endif %}
+
+{#                description#}
+                <tr>
+                    <td>Popis</td>
+                    {% if notice.description_missing %}
+                        <td>Chybí</td>
+                    {% else %}
+                        <td>{{ notice.description }}</td>
+                    {% endif %}
+                </tr>
+
+            </table>
+
+
+            {% if notice.documents_missing %}
+                <h5>Žádné přiložené dokumenty</h5>
+            {% else %}
+                <h5>Přiložené dokumenty</h5>
+                {{ render_documents(notice.documents) }}
+            {% endif %}
+
+        </div>
+    </div>
+
+{%- endmacro %}
+
+
+
+
+{% macro render_board(board, sorted_notices, graph_data, show_board_name=True) %}
+
+            <table class="table">
+{#            name#}
+            {% if show_board_name %}
+                <tr>
+                    <td>Název</td>
+                    <td>{{ board.name }}</td>
+                </tr>
+            {% endif %}
+            <tr>
+                <td>Název vydavatele dat</td>
+                <td>{{ board.office_name }}</td>
+            </tr>
+
+{#            download url#}
+            {% if board.download_url_missing %}
+                <tr class="table-danger">
+                    <td>Odkaz ke stažení</td>
+                    <td>Chybí</td>
+                </tr>
+            {% elif not board.attempted_download %}
+                <tr>
+                    <td>Odkaz ke stažení</td>
+                    <td><a href="{{ board.download_url }}">Zatím neproveden pokus o stáhnutí</a></td>
+                </tr>
+            {% elif board.download_url_unreachable %}
+                <tr class="table-warning">
+                    <td>Odkaz ke stažení</td>
+                    <td><a href="{{ board.download_url }}">Nedostupný</a></td>
+                </tr>
+            {% else %}
+{#                <tr class="table-success">#}
+                <tr>
+                    <td>Odkaz ke stažení</td>
+                    <td><a href="{{ board.download_url }}">Dostupný</a></td>
+                </tr>
+            {% endif %}
+            </table>
+
+            <div class="col">
+                <div class="row">
+                    {% if graph_data['file_extensions_count']['data'] | length > 0 %}
+                        <div class="col">
+                            <h5>Graf znázorňující typy dokumentů přiložených k deskám</h5>
+                            <canvas id="file_extensions_count"></canvas>
+                        </div>
+                    {% endif %}
+                    {% if (graph_data['PDFs_text']['with'] > 0) or (graph_data['PDFs_text']['without'] > 0) %}
+                        <div class="col">
+                            <h5>Podíl PDF dokumentů obsahují textovou vrstvu</h5>
+                            <canvas id="division_of_pdfs_on_text"></canvas>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+{#            list notices#}
+            {% if sorted_notices|length > 0 %}
+                <h2>Vývěsky</h2>
+{#                <div class="container text-center">#}
+{#                <div class="col">#}
+                    {% for notice in sorted_notices %}
+{#                        <div class="row mt-3">#}
+{#                        <div class="row">#}
+                            {{ render_notice(notice) }}
+{#                        </div>#}
+                {% endfor %}
+{#                </div>#}
+            {% endif %}
+
+
+{#    {% block scripts %}#}
+{#        {{ super() }}#}
+        <script>
+
+            var file_extensions_count_chart = new Chart(
+                document.getElementById('file_extensions_count'),
+                {
+                type: 'bar',
+                data: {
+                    labels: {{ graph_data['file_extensions_count']['labels'] | safe }},
+                    {#labels: {{ documents_extensions_labels | safe }},#}
+                    datasets: [{
+                        label: 'File extensions',
+                        data: {{ graph_data['file_extensions_count']['data'] | safe }},
+                        {#data: {{ documents_extensions_data | safe }},#}
+                        backgroundColor: [
+                          'rgb(250,60,60)',
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                    options: {
+                        {#'responsive': false,#}
+                    }
+                }
+            );
+
+            var division_of_pdfs_on_text = new Chart(
+                document.getElementById('division_of_pdfs_on_text'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: ['s textovou vrstvou', 'bez textové vrstvy'],
+                        datasets: [{
+                            label: 'this is label',
+                            data: [{{ graph_data['PDFs_text']['with'] }},
+                                    {{ graph_data['PDFs_text']['without'] }}],
+                            backgroundColor: [
+                              'rgb(250,60,60)',
+                              'rgb(54,111,235)',
+                            ],
+                            hoverOffset: 4
+                         }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                }
+
+            );
+        </script>
+{#    {% endblock %}#}
+
+{%- endmacro %}

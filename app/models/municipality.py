@@ -1,7 +1,6 @@
 from typing import Optional
 
 from app import db
-from app.models.mapper import Mapper
 from app.utils.random_stuff import nested_get
 
 
@@ -12,9 +11,10 @@ class Municipality(db.Model):
     __website_columns__ = ['name', 'ruian', 'ico', 'has_board']
 
     name = db.Column(db.String(100), unique=False, nullable=False)
-    ruian = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    # municipality parts aside from Prague parts use their mains municipality office ico
+    has_extended_competence = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     ico = db.Column(db.Integer, unique=True, nullable=True)
+    ruian = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+
     parent_ruian = db.Column(db.Integer, db.ForeignKey('municipality.ruian'))
     parent = db.relationship("Municipality", remote_side=[ruian])
 
@@ -29,8 +29,13 @@ class Municipality(db.Model):
     def extract_from_dict(cls, data):
         name = nested_get(data, ['nazev', 'cs'])
         ruian = data['kod']
-        ico = Mapper.get_ico(ruian)
         parent_ruian: Optional[str] = None
         if 'obec' in data:
             parent_ruian = data['obec'].split(sep='/')[-1]
-        return cls(name=name, ruian=ruian, ico=ico, parent_ruian=parent_ruian)
+        return cls(name=name, ruian=ruian, parent_ruian=parent_ruian)
+
+    # def add_board(self, board):
+    #     self.has_board = True
+    #     self.boards.append(board)
+    #     if len(self.boards) > 1:
+    #         self.has_multiple_boards = True

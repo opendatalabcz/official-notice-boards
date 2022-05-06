@@ -1,7 +1,7 @@
 import pytest
 
 from app.language_translations import capitalize_first, capitalize_all_first_letters, Language, translate, \
-    translate_only
+    translate_only, split_column_name
 from app.models import NoticeDocument
 
 
@@ -101,3 +101,25 @@ def test_translate(data):
 def test_translate(input):
     with pytest.raises(ValueError):
         translate(**input)
+
+
+@pytest.mark.parametrize('data', [
+    {
+        'input': 'foo',
+        'expected': 'foo'
+    },
+    {
+        'input': 'foo bar',
+        'expected': 'foo bar'
+    },
+    {
+        'input': 'foo_bar',
+        'expected': 'foo bar'
+    },
+    {
+        'input': 'foo-bar',
+        'expected': 'foo bar'
+    },
+])
+def test_split_column_name(data):
+    assert split_column_name(data.get('input')) == data.get('expected')

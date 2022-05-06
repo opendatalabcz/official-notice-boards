@@ -8,7 +8,8 @@ from app import db
 from app.utils.random_stuff import nested_get
 
 
-class Mapper(db.Model):
+class Mapper:
+# class Mapper(db.Model):
     """
     Mapper model that maps together RUIAN and ICO of municipalities and municipality parts
     """
@@ -24,6 +25,7 @@ class Mapper(db.Model):
         ico = None
         if 'ico' in data:
             ico = nested_get(data, ['ico', 'value'])
+        # ico = nested_get(data, ['ico', 'value'])
         return cls(ruian=ruian, ico=ico)
 
     @classmethod

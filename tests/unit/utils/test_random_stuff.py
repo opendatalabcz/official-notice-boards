@@ -1,6 +1,6 @@
 import pytest
 
-from app.utils.random_stuff import return_null_if_empty, nested_get
+from app.utils.random_stuff import return_null_if_empty, nested_get, split_data_using_transpose
 
 
 @pytest.mark.parametrize('data', [
@@ -60,3 +60,25 @@ def test_return_null_if_empty(data):
 ])
 def test_nested_dict_get(data):
     assert data['expected_data'] == nested_get(data['input_dict'], data['key_list'])
+
+
+@pytest.mark.parametrize('data', [
+    {  # normal use case
+        'input': [(1, 'a'), (2, 'b'), (3, 'c')],
+        'output': ([1, 2, 3], ['a', 'b', 'c'])
+    },
+    {  # empty
+        'input': [],
+        'output': ([], [])
+    },
+    {  # length 3
+        'input': [(1, 'a', 1.0), (2, 'b', 2.0), (3, 'c', 3.0)],
+        'output': ([1, 2, 3], ['a', 'b', 'c'], [1.0, 2.0, 3.0])
+    },
+    {  # length 1
+        'input': [(1, 'a')],
+        'output': ([1], ['a'])
+    },
+])
+def test_split_data_using_transpose(data):
+    assert data['output'] == split_data_using_transpose(data['input'])

@@ -2,92 +2,31 @@
 {% from 'bootstrap5/pagination.html' import render_pager, render_pagination %}
 {% from 'bootstrap5/table.html' import render_table %}
 
-{% block head %}
-    {{ super() }}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
+{#{% block head %}#}
+{#    {{ super() }}#}
+{#    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>#}
+{#{% endblock %}#}
 
-{% block title %}{{ page_name }}{% endblock %}
+{% block title %}O stránce{% endblock %}
 {% block content %}
-    <h1>{{ page_name }}</h1>
-    <p>smth basic
-    <p>graph showing number of publishing municipalities
-    <canvas id="division_of_municipalities"></canvas>
-    <p> different sections
-    <p> files
-    <canvas id="file_extensions_count"></canvas>
+    <h1>O stránce</h1>
+    Tento webový portál se zaměřuje na získávání, zpracování a analýzu dat zveřejněných úředních desek dle zákona č. 106/1999 Sb. o svobodném přístupu k informacím.
 
-    <p>delete?
-    <canvas id="division_of_boards"></canvas>
-{% endblock %}
-{% block scripts %}
-    {{ super() }}
-    <script>
+    <h2>Sekce <a href="statistics">Statistiky</a></h2>
+    Tato sekce se skládá z grafů o zveřejněných úředních deskách
 
-        var division_of_boards_chart = new Chart(
-            document.getElementById('division_of_boards'),
-            {
-            type: 'pie',
-            data: {
-                labels: ['by municipalities', 'rest'],
-                datasets: [{
-                    label: 'My First dataset',
-                    data: [{{ boards_by_municipalities }}, {{ boards_rest_count }}],
-                    backgroundColor: [
-                      'rgb(250,60,60)',
-                      'rgb(54,111,235)',
-                    ],
-                    hoverOffset: 4
-                }]
-            },
-                options: {
-                    'responsive': false,
-                }
-            }
-        );
+    <h2>Sekce <a href="municipalities">Obce</a></h2>
+    <p>V této sekci se nachází seznam všech obcí a městkých částí v České republice, ve kterém lze vyhledávat dle názvu.
+        U každého záznamu jsou základní informace a odkaz na samostanou stránku s detailní přehledem
+        úřední desky publikované obecním úřadem dané obce / městské části.</p>
 
+    <h2>Sekce <a href="municipalities">Úřední desky</a></h2>
+    <p>V této sekci se nachází seznam všech úředních desek přístupných v NKODu = Národním Katalogu Otevřených Dat.
+        Stejně jako u sekce Obce, tak u každého záznamu jsou základní informace a odkaz na samostanou stránku s detailní přehledem
+        úřední desky.</p>
 
-        var division_of_municipalities_chart = new Chart(
-            document.getElementById('division_of_municipalities'),
-            {
-            type: 'pie',
-            data: {
-                labels: ['published board', 'rest'],
-                datasets: [{
-                    label: 'My First dataset',
-                    data: [{{ boards_by_municipalities }}, {{ municipalities_rest_count }}],
-                    backgroundColor: [
-                      'rgb(250,60,60)',
-                      'rgb(54,111,235)',
-                    ],
-                    hoverOffset: 4
-                }]
-            },
-                options: {
-                    'responsive': false,
-                }
-            }
-        );
+    <h2>Sekce <a href="documents">Documenty na deskách</a></h2>
+    <p>Tato sekce zobrazuje list všech dokumentů které jsou odkazovány z úředních desek a umožnuje "full-text"
+    vyhledávání nad extrahovným textem z techto dokumentů.</p>
 
-        var file_extensions_count_chart = new Chart(
-            document.getElementById('file_extensions_count'),
-            {
-            type: 'bar',
-            data: {
-                labels: {{ documents_extensions_labels | safe }},
-                datasets: [{
-                    label: 'File extensions',
-                    data: {{ documents_extensions_data | safe }},
-                    backgroundColor: [
-                      'rgb(250,60,60)',
-                    ],
-                    hoverOffset: 4
-                }]
-            },
-                options: {
-                    {#'responsive': false,#}
-                }
-            }
-        );
-    </script>
 {% endblock %}

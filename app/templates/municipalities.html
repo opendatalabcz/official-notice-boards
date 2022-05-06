@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/pagination.html' import render_pagination %}
-{% from 'bootstrap5/table.html' import render_table %}
+{% from 'bootstrap5/table.html' import render_table, build_url %}
 
 {% block title %}{{ table_name }}{% endblock %}
 {% block content %}
@@ -10,6 +10,41 @@
         <button class="btn btn-primary my-2 my-sm-0" type="submit">Hledat</button>
     </form>
 
-    {{ render_table(records, titles=titles, responsive=True, primary_key='ruian', model=Municipality, show_actions=True, view_url=('view_municipality', [('municipality_ruian', ':ruian')])) }}
-    {{ render_pagination(pagination) }}
+
+
+    <table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Název</th>
+            <th scope="col">RÚIAN</th>
+            <th scope="col">IČO</th>
+            <th scope="col">Úřední deska je přístupná přes NKOD</th>
+            <th scope="col">Má úřad s rozšířenou působností</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for municipality in records %}
+        <tr>
+            <td><a href="{{ build_url('view_municipality', Municipality, municipality.ruian, [('municipality_ruian', ':ruian')]) | trim }}">{{ municipality.name }}</a></td>
+            <td>{{ municipality.ruian }}</td>
+                <td>{% if municipality.ico == None %}Nemá vlastní IČO{% else %}{{ '%08d' % municipality.ico }}{% endif %}</td>
+
+            {% if municipality.has_board %}
+                <td>Ano</td>
+            {% else %}
+                <td {% if municipality.has_extended_competence %}class="table-danger"{% endif %} >
+                    Ne
+                </td>
+            {% endif %}
+            <td>{% if municipality.has_extended_competence %}Ano{% else %}Ne{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+
+
+
+
+    {{ render_pagination(pagination, align='center') }}
 {% endblock %}

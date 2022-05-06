@@ -29,6 +29,13 @@ def _fetch_list_url(is_part: bool) -> str:
     return url
 
 
+def _fetch_list_url_hardcoded(is_part: bool) -> str:
+    municipality_list_url = "https://data.mpsv.cz/od/soubory/ciselniky/obce.json"
+    municipality_part_list_url = "https://data.mpsv.cz/od/soubory/ciselniky/mestske-obvody-mestske-casti.json"
+    url = municipality_part_list_url if is_part else municipality_list_url
+    return url
+
+
 def fetch_municipality_list(is_part: bool) -> list[dict[Any, Any]]:
     url = _fetch_list_url(is_part)
     return requests.get(url).json()['polozky']

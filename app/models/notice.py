@@ -15,11 +15,19 @@ class Notice(db.Model):
 
     iri = db.Column(db.String(1024), unique=False, nullable=True)
     iri_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
-    url = db.Column(db.String(1024), unique=False, nullable=True)  # TODO uncomment
+    url = db.Column(db.String(1024), unique=False, nullable=True)
     url_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
-    # types: list[Type]
-    name = db.Column(db.Text, unique=False, nullable=True)  # TODO change, db.String(2048), either really too short, or some weird character is causing trouble
+
+    name = db.Column(db.Text, unique=False, nullable=True)
     name_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
+
+    description = db.Column(db.Text, unique=False, nullable=True)
+    description_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
+
+    reference_number = db.Column(db.String(100), unique=False, nullable=True)
+    reference_number_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
+
+    revision = db.Column(db.String(100), unique=False, nullable=True)
 
     post_date = db.Column(db.DateTime, unique=False, nullable=True)
     post_date_wrong_format = db.Column(db.Boolean, unique=False, nullable=False, default=False)
@@ -47,30 +55,38 @@ class Notice(db.Model):
             case {"datum": date_raw} | {"datum_a_čas": date_raw}:
                 date = datetime.fromisoformat(date_raw)  # TODO wrap by try/except
                 bad_format = False
-            case {"Časový okamžik": date_raw}:  # TODO maybe delete and put in default case
+            case {"Časový okamžik": date_raw}:
                 date = datetime.fromisoformat(date_raw)
             case _:
                 pass
         return date, bad_format
 
     @classmethod
-    def extract_from_dict(cls, data):  # TODO check url == '-as4udetail-65481'
+    def extract_from_dict(cls, data):
         instance = cls()
 
         # extract IRI
         instance.iri = return_null_if_empty(data.get('iri'))
-        if instance.iri is None:
-            instance.iri_missing = True
+        instance.iri_missing = bool(instance.iri is None)
 
         # extract URL
         instance.url = return_null_if_empty(data.get('url'))
-        if instance.url is None:
-            instance.url_missing = True
+        instance.url_missing = bool(instance.url is None)
 
         # extract name
         instance.name = return_null_if_empty(nested_get(data, ['název', 'cs']))
-        if instance.name is None:
-            instance.name_missing = True
+        instance.name_missing = bool(instance.name is None)
+
+        # extract description
+        instance.description = return_null_if_empty(nested_get(data, ['popis', 'cs']))
+        instance.description_missing = bool(instance.description is None)
+
+        # extract reference_number
+        instance.reference_number = return_null_if_empty(data.get('číslo_jednací'))
+        instance.reference_number_missing = bool(instance.reference_number is None)
+
+        instance.revision = data.get('revize')
+
 
         # extract dates
         instance.post_date, instance.post_date_wrong_format = \
@@ -78,17 +94,16 @@ class Notice(db.Model):
         instance.relevant_until_date, instance.relevant_until_date_wrong_format = \
             cls._extract_datetime_from_dict(data.get('relevantní_do'))
 
-        # extract documents
+        # extract documents (only info about it)
         documents_raw = data.get('dokument', [])
         match documents_raw:
             case None | []:
                 instance.documents_missing = True
                 logging.info("No documents for %s}", instance.url)
-            case [_] | [_, *_]:  # 1+ documents in a list
+            case [_] | [_, *_]:
                 for document_raw in documents_raw:
                     instance.documents.append(NoticeDocument.extract_from_dict(document_raw))
             case _:
                 instance.documents_wrong_format = True
-                logging.info("Wrong documents format for %s: %s", instance.url, documents_raw)
-                # raise ValueError(f"Unknown documents format: {documents_raw}")
+                logging.warning("Wrong documents format for %s: %s", instance.url, documents_raw)
         return instance

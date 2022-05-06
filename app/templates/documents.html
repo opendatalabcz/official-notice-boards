@@ -6,11 +6,58 @@
 {% block content %}
     <h1>{{ table_name }}</h1>
     <form class="d-flex" action="{{ url_for('view_documents') }}" method="get">
-        <input class="form-control me-sm-2" type="text" placeholder="Search" name="search">
-        <button class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
+        <input class="form-control me-sm-2" type="text" placeholder="Hledat" name="search">
+        <button class="btn btn-primary my-2 my-sm-0" type="submit">Hledat</button>
     </form>
 
 {#    {{ render_table(records, responsive=True) }}#}
-    {{ render_table(records, titles=titles, responsive=True, model=NoticeDocument) }}
-    {{ render_pagination(pagination) }}
+{#    {{ render_table(records, titles=titles, responsive=True, model=NoticeDocument) }}#}
+
+     <table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Název</th>
+            <th scope="col">Odkaz ke stažení</th>
+            <th scope="col">Název vydavatele dat</th>
+            <th scope="col">Ukázka extrahovaného textu</th>
+            <th scope="col">Přípona souboru</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for document in records %}
+        <tr>
+            <td>{{ document.name }}</td>
+
+            {% if document.download_url_missing %}
+                    <td class="table-danger">Chybí</td>
+            {% elif not document.attempted_download %}
+                    <td class="table-info"><a href="{{ document.download_url }}">Zatím neproveden pokus o stáhnutí</a></td>
+            {% elif document.download_url_unreachable %}
+                    <td class="table-danger"><a href="{{ document.download_url }}">Nedostupný</a></td>
+            {% elif document.file_missing %}
+                    <td class="table-danger"><a href="{{ document.download_url }}">Nejedná se o dokument</a></td>
+            {% else %}
+                    <td><a href="{{ document.download_url }}">Dostupný</a></td>
+            {% endif %}
+
+
+            <td>{{ document.notice.official_notice_board.office_name }}</td>
+
+            {% if not document.attempted_extraction %}
+                    <td class="table-info">Zatím neproveden pokus o extrakci</td>
+            {% elif document.extraction_fail %}
+                    <td class="table-danger">Chyba při extrakci</td>
+            {% elif document.file_contains_no_text %}
+                    <td class="table-danger">Neobsahuje textovou vrstvu</td>
+            {% else %}
+                <td>{{ document.shortened_extracted_text }}</td>
+        {% endif %}
+
+            <td>{{ document.file_extension }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+    {{ render_pagination(pagination, align='center') }}
 {% endblock %}
