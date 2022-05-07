@@ -218,12 +218,9 @@
 
 {#            list notices#}
             {% if sorted_notices|length > 0 %}
-                <h2>Vývěsky</h2>
-{#                <div class="container text-center">#}
-{#                <div class="col">#}
+{#                <h2>Vývěsky</h2>#}
+                <h2>Oznámení</h2>
                     {% for notice in sorted_notices %}
-{#                        <div class="row mt-3">#}
-{#                        <div class="row">#}
                             {{ render_notice(notice) }}
 {#                        </div>#}
                 {% endfor %}
@@ -243,7 +240,8 @@
                     labels: {{ graph_data['file_extensions_count']['labels'] | safe }},
                     {#labels: {{ documents_extensions_labels | safe }},#}
                     datasets: [{
-                        label: 'File extensions',
+                        {#label: 'attached documents',#}
+                        label: 'Přiložené dokumenty',
                         data: {{ graph_data['file_extensions_count']['data'] | safe }},
                         {#data: {{ documents_extensions_data | safe }},#}
                         backgroundColor: [
@@ -265,7 +263,8 @@
                     data: {
                         labels: ['s textovou vrstvou', 'bez textové vrstvy'],
                         datasets: [{
-                            label: 'this is label',
+                            {#label: 'attached PDF documents',#}
+                            label: 'Přiložené PDF dokumenty',
                             data: [{{ graph_data['PDFs_text']['with'] }},
                                     {{ graph_data['PDFs_text']['without'] }}],
                             backgroundColor: [

@@ -19,7 +19,7 @@
                 <h4>Stav publikování obecními úřady s rozšířenou působností</h4>
             </div>
             <div class="col mx-3">
-                <h4>Podíl desek publikovaných obecními úřady, podle toho zdali se jedná o úřad s rozšířenou působností, či ne</h4>
+                <h4>Rozdělení desek obecních úřadu, podle typu úřadu</h4>
             </div>
         </div>
         <div class="row mb-3">
@@ -32,7 +32,7 @@
         </div>
 
         <div class="row my-3">
-            <h4>Porušení Desky obecních úřadů s nesplňují minimální povinnou specifikace</h4>
+            <h4>Desky obecních úřadů s nesplňují minimální povinnou specifikace</h4>
             <canvas id="municipalities_no_comply_min_spec"></canvas>
         </div>
 
@@ -81,7 +81,8 @@
                 data: {
                     labels: ['publikují', 'nepublikují'],
                     datasets: [{
-                        label: 'this is label',
+                        {#label: 'Municipality offices with extended competence',#}
+                        label: 'Obecní úřady s rozšířenou působností',
                         data: [{{ graph_data['extended_competence_publish_out_of_all']['do_comply'] }},
                                 {{ graph_data['extended_competence_publish_out_of_all']['dont_comply'] }}],
                         backgroundColor: [
@@ -114,7 +115,8 @@
                 data: {
                     labels: ['s rozšířenou působností', 'bez rozšířené působnosti'],
                     datasets: [{
-                        label: 'this is label',
+                        {#label: 'Publishing municipality offices',#}
+                        label: 'Publikující obecní úřady',
                         data: [{{ graph_data['extended_competence_publish_out_of_municipalities']['extended'] }},
                                 {{ graph_data['extended_competence_publish_out_of_municipalities']['not_extended'] }}],
                         backgroundColor: [
@@ -138,7 +140,8 @@
             data: {
                 labels: {{ graph_data['file_extensions_count']['labels'] | safe }},
                 datasets: [{
-                    label: 'File extensions',
+                    {#label: 'attached documents',#}
+                    label: 'Přiložené dokumenty',
                     data: {{ graph_data['file_extensions_count']['data'] | safe }},
                     backgroundColor: [
                       'rgb(250,60,60)',
@@ -159,7 +162,8 @@
                 data: {
                     labels: ['s textovou vrstvou', 'bez textové vrstvy'],
                     datasets: [{
-                        label: 'this is label',
+                        {#label: 'attached PDF documents',#}
+                        label: 'Přiložené PDF dokumenty',
                         data: [{{ graph_data['PDFs_text']['with'] }},
                                 {{ graph_data['PDFs_text']['without'] }}],
                         backgroundColor: [
@@ -183,7 +187,8 @@
             data: {
                 labels: {{ graph_data['municipalities_unreachable_documents']['labels'] | safe }},
                 datasets: [{
-                    label: 'File extensions',
+                    {#label: 'Municipalities with unreachable documents',#}
+                    label: 'Dokumenty s nedostupnou adresou',
                     data: {{ graph_data['municipalities_unreachable_documents']['data'] | safe }},
                     backgroundColor: [
                       'rgb(250,60,60)',
@@ -204,7 +209,8 @@
             data: {
                 labels: {{ graph_data['municipalities_scanned_pdfs_documents']['labels'] | safe }},
                 datasets: [{
-                    label: 'File extensions',
+                    {#label: 'attached PDF documents',#}
+                    label: 'Přiložené PDF dokumenty',
                     data: {{ graph_data['municipalities_scanned_pdfs_documents']['data'] | safe }},
                     backgroundColor: [
                       'rgb(250,60,60)',
@@ -246,7 +252,8 @@
             data: {
                 labels: {{ graph_data['municipalities_no_comply_min_spec']['labels'] | safe }},
                 datasets: [{
-                    label: 'File extensions',
+                    {#label: 'municipality offices violating minimum specification',#}
+                    label: 'Obecní úřady porušující minimální specifikaci',
                     data: {{ graph_data['municipalities_no_comply_min_spec']['data'] | safe }},
                     backgroundColor: [
                       'rgb(250,60,60)',

@@ -204,7 +204,7 @@ def query_data_for_board_graphs(board_id: int) -> dict[str, Any]:  # TODO move
         .limit(5).all()
     # documents_extensions_data, documents_extensions_labels = map(list, zip(*documents_extensions_query))
     documents_extensions_data, documents_extensions_labels = split_data_using_transpose(documents_extensions_query)
-    # documents_extensions_labels = list(filter(lambda x: x is not None, documents_extensions_labels))
+    documents_extensions_labels = list(filter(lambda x: x is not None, documents_extensions_labels))
 
     graph_data = {
         'file_extensions_count': {'data': documents_extensions_data,

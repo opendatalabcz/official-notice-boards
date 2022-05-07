@@ -24,7 +24,6 @@ def first_import() -> bool:
 
 def import_municipalities():
     current_app.logger.info("Started municipality data import")
-    print("Started municipality data import")
     for municipality_raw in fetch_municipality_list(is_part=False):
         municipality_record = Municipality.extract_from_dict(municipality_raw)
         db.session.add(municipality_record)
@@ -35,18 +34,15 @@ def import_municipalities():
         municipality_part_record = Municipality.extract_from_dict(municipality_part_raw)
         db.session.add(municipality_part_record)
     current_app.logger.info("Finished municipality part data import")
-    print("Finished municipality part data import")
 
 
 def map_municipalities_ruian_2_ico():
     current_app.logger.info("Started mapper data import")
-    print("Started mapper data import")
     for ruian, ico in fetch_ruian_2_ico_mapper():
         municipality_record = Municipality.query.filter(Municipality.ruian == ruian).first()
         if municipality_record is None:
             current_app.logger.warning("Cannot ")
         municipality_record.ico = ico
-    print("Finished mapper data import")
     current_app.logger.info("Finished mapper data import")
 
 
@@ -60,7 +56,6 @@ def mark_municipalities_with_extended_power():
 
 
 def import_boards_list():
-    print("Started board list data import")
     current_app.logger.info("Started board list data import")
 
     for row in fetch_boards_data():
@@ -72,16 +67,13 @@ def import_boards_list():
             .order_by(OfficialNoticeBoard.id)\
             .all()
         if len(existing_boards) > 0:
-            print(f"Found existing identical board, office_name='{new_board.office_name}', download_url={new_board.download_url}")
             current_app.logger.info("Found existing identical board, office_name='%s', download_url=%s", new_board.office_name, new_board.download_url)
             if len(existing_boards) > 1:
-                print(f"Multiple existing identical boards found, office_name='{new_board.office_name}', download_url={new_board.download_url}")
                 current_app.logger.error("Multiple existing identical boards found, office_name='%s', download_url=%s", new_board.office_name, new_board.download_url)
 
         # brand new board
         elif len(existing_boards) == 0:
             current_app.logger.info("Found new board")
-            print("Found new board")
             db.session.add(new_board)
             related_municipalities = Municipality.query.filter(Municipality.ico == new_board.ico).all()
             for m in related_municipalities:
@@ -89,7 +81,6 @@ def import_boards_list():
                 m.has_board = True
 
     current_app.logger.info("Finished board list data import")
-    print("Finished board list data import")
 
 
 def import_boards(only_municipality_boards: bool):
@@ -98,7 +89,6 @@ def import_boards(only_municipality_boards: bool):
     query = OfficialNoticeBoard.query
     if only_municipality_boards:
         current_app.logger.info("Importing only municipality boards")
-        print("Importing only municipality boards")
         query = query.join(Municipality, OfficialNoticeBoard.municipality_ruian == Municipality.ruian)
 
     for board in query.all():
@@ -131,20 +121,16 @@ def download_extract_documents(directory_path: str, delete_files: bool):
 
 
 def import_data(force_import_all: bool):
-    print("Before calling create_app")
 
     app = create_app()
     app.app_context().push()
     current_app.logger.info("After pushing APP context")
 
-    print("Starting import")
     if first_import() or force_import_all:
         current_app.logger.info("Importing all data")
-        print("THIS IS FIRST IMPORT")
         db.drop_all()
         db.create_all()
         current_app.logger.info("Dropped and created database")
-        print("Dropped and created database")
 
         import_municipalities()
         map_municipalities_ruian_2_ico()
