@@ -10,5 +10,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD [ "pip", "install", "-e", "." ]
+RUN pip install -e .
 CMD [ "flask", "run" ]
