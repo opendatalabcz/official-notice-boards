@@ -104,6 +104,9 @@ def import_boards(only_municipality_boards: bool):
 def download_extract_documents(directory_path: str, delete_files: bool):
     current_app.logger.info("Started documents download and text extraction")
 
+    # create directory for documents if it does not exist
+    Path(directory_path).mkdir(exist_ok=True)
+
     # random order, so that 1 server is not hit too often
     for document in NoticeDocument.query\
             .filter(NoticeDocument.attempted_download == False)\
