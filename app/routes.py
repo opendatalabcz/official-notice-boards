@@ -4,7 +4,7 @@ from flask import render_template, request
 from sqlalchemy import func, desc
 
 from app import db
-from app.language_translations import translate
+from app.utils.language_translations import translate
 from app.models import *
 from app.utils.random_stuff import split_data_using_transpose
 from app.utils.website import map_table_key_names
@@ -173,7 +173,7 @@ def view_boards():
                              (OfficialNoticeBoard.office_name.ilike(f'%{search}%')))
 
     pagination = query.order_by(OfficialNoticeBoard.name) \
-        .paginate(page, per_page=PAGE_SIZE)
+        .paginate(page=page, per_page=PAGE_SIZE)
 
     records = pagination.items
     titles = map_table_key_names(OfficialNoticeBoard)

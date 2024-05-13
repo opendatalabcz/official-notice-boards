@@ -24,7 +24,7 @@ class Notice(db.Model):
     description = db.Column(db.Text, unique=False, nullable=True)
     description_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
 
-    reference_number = db.Column(db.String(100), unique=False, nullable=True)
+    reference_number = db.Column(db.String(255), unique=False, nullable=True)
     reference_number_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
 
     revision = db.Column(db.String(100), unique=False, nullable=True)
@@ -53,12 +53,15 @@ class Notice(db.Model):
             case {"nespecifikovaný": True}:
                 bad_format = False
             case {"datum": date_raw} | {"datum_a_čas": date_raw}:
-                date = datetime.fromisoformat(date_raw)  # TODO wrap by try/except
-                bad_format = False
+                try:
+                    date = datetime.fromisoformat(date_raw)  # TODO wrap by try/except
+                    bad_format = False
+                except ValueError:
+                    logging.warning("Wrong date format: %s", data)
             case {"Časový okamžik": date_raw}:
                 date = datetime.fromisoformat(date_raw)
             case _:
-                pass
+                logging.warning("Wrong date format: %s", data)
         return date, bad_format
 
     @classmethod

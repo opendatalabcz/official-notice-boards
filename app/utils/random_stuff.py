@@ -22,3 +22,14 @@ def split_data_using_transpose(input_data) -> tuple[list[Any], list[Any]]:
     if len(input_data) == 0:
         return [], []
     return tuple(map(list, zip(*input_data)))
+
+
+def add_count_query_results(results: list[list[tuple[int, str]]]):
+    tmp_results = {}
+    for input_results in results:
+        for count, name in input_results:
+            if name not in tmp_results:
+                tmp_results[name] = count
+            else:
+                tmp_results[name] += count
+    return sorted([(c, n) for n, c in tmp_results.items()], key=lambda x: x[0], reverse=True)

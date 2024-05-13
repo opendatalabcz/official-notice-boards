@@ -37,5 +37,5 @@ def _fetch_list_url_hardcoded(is_part: bool) -> str:
 
 
 def fetch_municipality_list(is_part: bool) -> list[dict[Any, Any]]:
-    url = _fetch_list_url(is_part)
+    url = _fetch_list_url_hardcoded(is_part)
     return requests.get(url).json()['polozky']

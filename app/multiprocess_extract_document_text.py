@@ -2,11 +2,24 @@ import logging
 from multiprocessing import Process
 
 import numpy as np
+from sqlalchemy import func
 
 from app import db
 from app.models import *
 
 MAX_PROCESS_COUNT = 12
+DOCUMENT_DIRECTORY = "../../data/documents/"
+
+
+def extract_paral():
+    while True:
+        db.session.begin()
+        document = NoticeDocument.query.filter(NoticeDocument.attempted_download == False).order_by(func.random()).first()
+        if document is None:
+            break
+        document.download(directory_path=DOCUMENT_DIRECTORY)
+        document.extract_text()
+        db.session.commit()
 
 
 def extract_documents_text(id_range):

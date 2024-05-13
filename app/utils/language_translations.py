@@ -42,12 +42,27 @@ CS: Final[dict[str, str]] = {
 }
 
 
-def translate_only(language: str, expressions: str) -> str | None:
-    if language == 'cs':
-        return CS[expressions]
-    if language == 'en':
+class Translator:
+    supported_languages = ['cs', 'en']
+
+    def __init__(self, language: str, capitalize_mode: int = 0):
+        if language not in self.supported_languages:
+            raise ValueError(f"Language code {language} is not supported.")
+
+        self.language = language
+        self.capitalize_mode = capitalize_mode
+
+    # def _get_capitalize_function(self) -> callable:
+    #     return capitalize_function
+
+    # def translate(self, expressions: str) -> str:
+    #     return CS[key]
+
+    def translate_only(self, expressions: str) -> str | None:
+        if self.language == 'cs':
+            return CS[expressions]
+        # if self.language == 'en':
         return expressions
-    raise ValueError(f"Language code {language} is not supported.")
 
 
 def translate(language: str, expressions: str, capitalize_mode: int = 0) -> str | None:

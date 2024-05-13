@@ -3,26 +3,50 @@ from app.sparql.query import run_query
 from app.utils.random_stuff import nested_get
 
 # _GET_MAPPER_QUERY = \
-#     """
-#     SELECT DISTINCT ?city ?ruian ?ico ?location
-#     WHERE
+# SELECT
+# DISTINCT ?city ?label ?ruian ?ico ?website_url  # ?email
+# WHERE
+# {
 #     {
-#       {
-#         ?city wdt:P7577 ?ruian ;
-#               wdt:P625 ?location .
-#         OPTIONAL
-#         {
-#           ?city wdt:P4156 ?ico .
-#         }
-#       }
-#       UNION
-#       {
-#         ?city wdt:P31 wd:Q5153359 ;
-#               wdt:P4156 ?ico ;
-#               wdt:P7606 ?ruian ;
-#               wdt:P625 ?location .
-#       }
-#     }
+# ?city
+# wdt: P7577 ?ruian;
+# rdfs: label ?label.
+#     OPTIONAL
+# {
+# ?city
+# wdt: P4156 ?ico.
+# }
+# OPTIONAL
+# {
+# ?city
+# wdt: P856 ?website_url
+# }
+# OPTIONAL
+# {
+#     #  ?city wdt:P968 ?email
+# }
+# }
+# UNION
+# {
+# ?city
+# wdt: P31
+# wd: Q5153359;
+# rdfs: label ?label;
+# wdt: P4156 ?ico;
+# wdt: P7606 ?ruian.
+#     OPTIONAL
+# {
+# ?city
+# wdt: P856 ?website_url
+# }
+# OPTIONAL
+# {
+#     #   ?city wdt:P968 ?email
+# }
+# }
+# FILTER(lang(?label) = 'cs')
+# }
+
 #     """
 
 MAP_RUIAN_2_ICO_QUERY = \

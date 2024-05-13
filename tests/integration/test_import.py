@@ -19,6 +19,8 @@ FETCH_DOCUMENTS_COUNT = 20
 
   # TODO check out https://pypi.org/project/vcrpy/
 
+# TODO set separate database for testing
+
 
 @pytest.fixture(scope="module")
 def tmp_directory_cleaner():
@@ -91,7 +93,8 @@ def _extract_documents_text():
 
 
 @pytest.fixture(scope="module")
-def import_all(tmp_directory_cleaner):
+# @pytest.mark.vcr()
+def test_import_all(tmp_directory_cleaner):
     db.drop_all()
     db.create_all()
     _import_mapper()
@@ -108,25 +111,21 @@ def new_transaction():
     db.session.close()
 
 
-@pytest.mark.integtest
-def test_import_mapper(import_all, new_transaction):
+def test_import_mapper(test_import_all, new_transaction):
     assert 6300 < Mapper.query.count()
     assert 6000 < Mapper.query.filter(Mapper.ico != None).filter(Mapper.ruian != None).count() < 6350
     assert 50 < Mapper.query.filter(Mapper.ico == None).filter(Mapper.ruian != None).count() < 200
 
 
-@pytest.mark.integtest
-def test_import_municipality(import_all, new_transaction):
+def test_import_municipality(test_import_all, new_transaction):
     assert Municipality.query.count() > 6300
 
 
-@pytest.mark.integtest
-def test_import_boards_list(import_all, new_transaction):
+def test_import_boards_list(test_import_all, new_transaction):
     assert OfficialNoticeBoard.query.count() == FETCH_BOARDS_COUNT
 
 
-@pytest.mark.integtest
-def test_import_boards(import_all, new_transaction):
+def test_import_boards(test_import_all, new_transaction):
     # query based on https://stackoverflow.com/questions/69116955/flask-sqlalchemy-filter-by-count-of-relationship-objects
     boards_with_some_notices = db.session.query(OfficialNoticeBoard,).\
         outerjoin(OfficialNoticeBoard.notices).\
@@ -138,12 +137,10 @@ def test_import_boards(import_all, new_transaction):
     assert NoticeDocument.query.count() > FETCH_BOARDS_COUNT
 
 
-@pytest.mark.integtest
-def test_download_documents(import_all, new_transaction):
+def test_download_documents(test_import_all, new_transaction):
     assert 0 < NoticeDocument.query.filter(NoticeDocument.attempted_download == True).count() <= FETCH_DOCUMENTS_COUNT
     assert 0 <= NoticeDocument.query.filter(NoticeDocument.download_url_missing == True).count() <= FETCH_DOCUMENTS_COUNT
 
 
-@pytest.mark.integtest
-def test_extract_documents_text(import_all, new_transaction):
+def test_extract_documents_text(test_import_all, new_transaction):
     assert 0 < NoticeDocument.query.filter(func.length(NoticeDocument.extracted_text) > FETCH_DOCUMENTS_COUNT/4).count() <= FETCH_DOCUMENTS_COUNT

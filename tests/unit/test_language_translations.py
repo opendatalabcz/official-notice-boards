@@ -1,8 +1,7 @@
 import pytest
 
-from app.language_translations import capitalize_first, capitalize_all_first_letters, Language, translate, \
+from app.utils.language_translations import capitalize_first, capitalize_all_first_letters, translate, \
     translate_only, split_column_name
-from app.models import NoticeDocument
 
 
 @pytest.mark.parametrize('data', [

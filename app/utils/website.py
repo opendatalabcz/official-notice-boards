@@ -2,7 +2,7 @@ from typing import Type, Any
 
 from flask_sqlalchemy import Model
 
-from app.language_translations import split_column_name, translate
+from app.utils.language_translations import split_column_name, translate
 
 
 def filter_model_to_table(instance: Model) -> dict[str, Any]:

@@ -11,7 +11,7 @@ class OfficialNoticeBoard(db.Model):
     __website_columns__ = ['id', 'office_name', 'ico', 'download_url', 'download_url_unreachable']
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), unique=False, nullable=True)
+    name = db.Column(db.String(255), unique=False, nullable=True)
     office_name = db.Column(db.String(100), unique=False, nullable=True)
     office_name_missing = db.Column(db.Boolean, unique=False, nullable=False, default=False)
 

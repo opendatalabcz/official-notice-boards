@@ -55,12 +55,12 @@ def extract_file_name_from_response(response: requests.Response) -> str:
     # return response.url.split('/')[-1]
 
     if document_name is None:  # TODO replace by commented part, but be careful, test it first
-        content_disposition = response.headers.get('Content-Disposition')
-        if content_disposition is not None:
-            document_name = re.findall("filename=(.+)", content_disposition)[0]
+        if content_disposition := response.headers.get('Content-Disposition'):
+            if filenames := re.findall("filename=(.+)", content_disposition):
+                return filenames[0]
     if document_name is None:
         content_type = response.headers.get('Content-Type')
-        if content_type is not None:
+        if content_type:
             document_name = '.' + content_type.split('/')[-1]
     if document_name is None:
         document_name = response.url.split('/')[-1]

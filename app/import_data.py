@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import current_app
 from sqlalchemy import func, inspect
 
@@ -109,11 +111,15 @@ def download_extract_documents(directory_path: str, delete_files: bool):
     Path(directory_path).mkdir(exist_ok=True)
 
     # random order, so that 1 server is not hit too often
-    for document in NoticeDocument.query\
-            .filter(NoticeDocument.attempted_download == False)\
-            .order_by(func.random())\
-            .all():
+    document_ids = list(map(lambda x: x[0], db.session.query(NoticeDocument.id)
+                            .filter(NoticeDocument.attempted_download == False)
+                            .order_by(func.random())
+                            .all()))
+    for document_id in document_ids:
 
+        document = NoticeDocument.query.get(document_id)
+
+        current_app.logger.info(f"Downloading document {document.download_url}")
         document.download(directory_path=directory_path)
         # if document.download(directory_path=directory_path):  # TODO maybe switch to this
         current_app.logger.info(f"Extracting text from document {document.download_url}")

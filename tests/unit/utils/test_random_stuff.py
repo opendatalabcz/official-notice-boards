@@ -24,37 +24,37 @@ def test_return_null_if_empty(data):
 @pytest.mark.parametrize('data', [
     {  # 2 keys
         'input_dict': {'a': {'b': 'c'}},
-        "key_list": ['a', 'b'],
+        'key_list': ['a', 'b'],
         'expected_data': 'c'
     },
     {  # 1 key, return str
         'input_dict': {'a': 'b'},
-        "key_list": ['a'],
+        'key_list': ['a'],
         'expected_data': 'b'
     },
     {  # 1 key, return dict
         'input_dict': {'a': {'b': 'c'}},
-        "key_list": ['a'],
+        'key_list': ['a'],
         'expected_data': {'b': 'c'}
     },
     {  # wrong 1st key
         'input_dict': {'a': {'b': 'c'}},
-        "key_list": ['x', 'b'],
+        'key_list': ['x', 'b'],
         'expected_data': None
     },
     {  # wrong 2nd key
         'input_dict': {'a': {'b': 'c'}},
-        "key_list": ['a', 'x'],
+        'key_list': ['a', 'x'],
         'expected_data': None
     },
     {  # too many keys
         'input_dict': {'a': {'b': 'c'}},
-        "key_list": ['a', 'b', 'c'],
+        'key_list': ['a', 'b', 'c'],
         'expected_data': None
     },
     {  # no keys
         'input_dict': {'a': {'b': 'c'}},
-        "key_list": [],
+        'key_list': [],
         'expected_data': {'a': {'b': 'c'}}
     },
 ])
