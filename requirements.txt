@@ -2,7 +2,8 @@ bootstrap-flask==2.0.2
 click==8.1.2
 docx2txt==0.8
 Flask-Migrate==3.1.0
-Flask-SQLAlchemy==2.5.1
+flask_bootstrap==3.3.7.1
+Flask-SQLAlchemy==3.0.2
 pdfminer.six==20220319
 pdfminer.six[image]
 psycopg2-binary==2.9.3

@@ -37,13 +37,13 @@ class NoticeDocument(db.Model):
     shortened_extracted_text = db.Column(db.String(100), unique=False, nullable=True)
     file_contains_no_text = db.Column(db.Boolean, unique=False, nullable=False, default=False)  # jpeg, xls, ...
 
-    # if True:  # change condition, this can be used to allow compatibility with other databases. Find out this could be find out from db instance
-    __ts_vector__ = db.Column(TSVector(), db.Computed(
-        "to_tsvector('english', name || ' ' || extracted_text)",
-        persisted=True))
-
-    __table_args__ = (Index('ix_notice_document___ts_vector__',
-                            __ts_vector__, postgresql_using='gin'),)
+    # # if True:  # change condition, this can be used to allow compatibility with other databases. Find out this could be find out from db instance
+    # __ts_vector__ = db.Column(TSVector(), db.Computed(
+    #     "to_tsvector('english', name || ' ' || extracted_text)",
+    #     persisted=True))
+    #
+    # __table_args__ = (Index('ix_notice_document___ts_vector__',
+    #                         __ts_vector__, postgresql_using='gin'),)
 
     def __repr__(self):
         return f"<NoticeDocument(id={self.id}, name='{self.name}', download_url='{self.download_url}', " \
