@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
+import logging
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -15,7 +16,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     bootstrap = Bootstrap5(app)
-    # logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO)
 
     register_routes(app)
     return app

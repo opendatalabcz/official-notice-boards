@@ -92,6 +92,7 @@ def import_boards(only_municipality_boards: bool):
         query = query.join(Municipality, OfficialNoticeBoard.municipality_ruian == Municipality.ruian)
 
     for board in query.all():
+        current_app.logger.info("Importing board %s", board.name)
         board.download()
         for notice_record in board.notices:
             db.session.add(notice_record)
@@ -115,9 +116,11 @@ def download_extract_documents(directory_path: str, delete_files: bool):
 
         document.download(directory_path=directory_path)
         # if document.download(directory_path=directory_path):  # TODO maybe switch to this
+        current_app.logger.info(f"Extracting text from document {document.download_url}")
         document.extract_text()
         if delete_files:
             document.delete_file()
+        current_app.logger.info("Commiting")
         db.session.commit()  # TODO might delete this
 
     current_app.logger.info("Finished documents download and text extraction")
